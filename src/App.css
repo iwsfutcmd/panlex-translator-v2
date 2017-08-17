@@ -1,0 +1,23 @@
+.App {
+  margin: 0px auto;
+  padding: 0px 16px;
+  text-align: center;
+  max-width: 480px;
+}
+
+.langvar-select {
+  display: flex;
+}
+
+.result {
+  margin-top: 16px;
+}
+
+.trn-row td {
+  text-align: start !important;
+  height: 40px !important;
+}
+
+.trn-row td div div {
+  margin: unset !important;
+}

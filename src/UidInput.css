@@ -1,0 +1,18 @@
+.uid-item {
+  /*margin-bottom: 1em;*/
+}
+
+.uid-line {
+  line-height: normal;
+}
+
+.uid-main {
+  display: flex;
+  justify-content: space-between;
+}
+
+.uid-alt {
+  margin-inline-start: 1em;
+  font-size: small;
+  color: darkgray;
+}
