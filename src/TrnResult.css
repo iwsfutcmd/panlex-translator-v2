@@ -1,0 +1,23 @@
+.trn-row {
+  height: 40px !important;
+  /*display: flex;*/
+  /*align-items: center;*/
+}
+
+.trn-row td {
+  text-align: start !important;
+  height: 40px !important;
+}
+
+.bon-bar-cell {
+  width: 48px;
+  padding: unset !important;
+  margin: 0 8px;
+}
+
+.bon-bar {
+  vertical-align: middle;
+}
+/*.trn-row td div div {
+  margin: unset !important;
+}*/

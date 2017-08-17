@@ -4,18 +4,19 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import { Table, TableBody, TableRow, TableRowColumn } from 'material-ui/Table';
+// import { Table, TableBody, TableRow, TableRowColumn } from 'material-ui/Table';
 import CircularProgress from 'material-ui/CircularProgress';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import './App.css';
 import { getTranslations } from './api';
 import UidInput from './UidInput';
+import TrnResult from './TrnResult';
 
 const panlexRed = '#A60A0A';
 injectTapEventPlugin();
 
-const DEBUG = true;
+const DEBUG = false;
 
 class App extends Component {
   constructor(props) {
@@ -25,7 +26,7 @@ class App extends Component {
         primary1Color: panlexRed,
       }
     })
-    let labelsToTranslate = ['lng', 'tra', 'al', 'de', 'txt']
+    let labelsToTranslate = ['lng', 'tra', 'al', 'de', 'txt', 'mod']
     
     this.state = {
       muiTheme,
@@ -35,7 +36,7 @@ class App extends Component {
       uidAl: '',
       txt: '',
       interfaceLang: 'eng-000',
-      translations: [{txt: 'dog'}, {txt: 'cat'}],
+      translations: [{txt: 'dog', trans_quality: 10}, {txt: 'cat', trans_quality: 5}],
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
     }
     this.setLabels();
@@ -68,11 +69,20 @@ class App extends Component {
       <div className="App" style={{direction: this.state.direction}}>
         <MuiThemeProvider muiTheme={this.state.muiTheme}>
           <div>
-            {DEBUG &&
+            {DEBUG && [
               <RaisedButton
                 label="🔁"
                 onClick={() => this.setState({direction: (this.state.direction === 'rtl') ? 'ltr' : 'rtl'})}
-              />
+              />,
+              <UidInput
+                onNewRequest={(item) => {
+                  this.setState({ interfaceLang: item.text });
+                  this.setLabels();
+                }}
+                direction={this.state.direction}
+                label={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
+                interfaceLangvar={this.state.interfaceLangvar}
+              />]
             }
             <div className="langvar-select">
               <UidInput
@@ -101,23 +111,7 @@ class App extends Component {
             <div className="result">
               {(this.state.loading) ?
                 <div><CircularProgress/></div> :
-                <Table>
-                  <TableBody displayRowCheckbox={false}>
-                    {this.state.translations.map( (trn, index) =>
-                      <TableRow
-                        className="trn-row"
-                        key={index}
-                        style={{height: '40px'}}
-                      >
-                        <TableRowColumn
-                          style={{fontSize: '16px', height: '40px'}}
-                        >
-                          {trn.txt}
-                        </TableRowColumn>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                <TrnResult muiTheme={this.state.muiTheme} translations={this.state.translations}/>
               }
             </div>
           </div>

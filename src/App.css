@@ -12,12 +12,3 @@
 .result {
   margin-top: 16px;
 }
-
-.trn-row td {
-  text-align: start !important;
-  height: 40px !important;
-}
-
-.trn-row td div div {
-  margin: unset !important;
-}
