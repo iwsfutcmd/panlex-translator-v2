@@ -18,7 +18,7 @@ export default class TrnResult extends Component {
               >
                 <TableRowColumn 
                   className="bon-bar-cell"
-                  style={{transform: "scaleX(-1)"}}
+                  style={{transform: (this.props.direction === 'rtl') ? "scaleX(1)" : "scaleX(-1)"}}
                 >
                   <svg className="bon-bar" width={48} height={16}>
                     <rect width={48} height={16} rx={4} ry={4} fill="rgb(189, 189, 189)"/>

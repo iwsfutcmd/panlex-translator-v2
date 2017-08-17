@@ -111,7 +111,10 @@ class App extends Component {
             <div className="result">
               {(this.state.loading) ?
                 <div><CircularProgress/></div> :
-                <TrnResult muiTheme={this.state.muiTheme} translations={this.state.translations}/>
+                <TrnResult
+                  muiTheme={this.state.muiTheme}
+                  direction={this.state.direction}
+                  translations={this.state.translations}/>
               }
             </div>
           </div>
