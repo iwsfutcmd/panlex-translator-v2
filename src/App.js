@@ -36,7 +36,7 @@ class App extends Component {
       uidAl: '',
       txt: '',
       interfaceLang: 'eng-000',
-      translations: [{txt: 'dog', trans_quality: 10}, {txt: 'cat', trans_quality: 5}],
+      translations: [],
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
     }
     this.setLabels();

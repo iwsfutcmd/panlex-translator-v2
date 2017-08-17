@@ -5,8 +5,7 @@ import './TrnResult.css';
 
 export default class TrnResult extends Component {
   render() {
-    let maxBon = this.props.translations[0].trans_quality;
-    
+    let maxBon = (this.props.translations.length) ? this.props.translations[0].trans_quality : 1;
     return (
       <Table>
         <TableBody displayRowCheckbox={false}>
