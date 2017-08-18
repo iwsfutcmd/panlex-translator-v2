@@ -4,6 +4,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import AppBar from 'material-ui/AppBar';
 // import { Table, TableBody, TableRow, TableRowColumn } from 'material-ui/Table';
 import CircularProgress from 'material-ui/CircularProgress';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -59,7 +60,7 @@ class App extends Component {
     // let savedFakeExprs = this.state.fakeExprs.filter((fakeExpr) => fakeExpr.saved)
     this.setState({loading: true})
     // query('/fake_expr', {'uid': this.state.uid, 'state_size': 11 - this.state.chaos, 'count': 25})
-    getTranslations(this.state.txt, this.state.uidDe, this.state.uidAl)
+    getTranslations(this.state.txt.trim(), this.state.uidDe, this.state.uidAl)
     .then((result) => this.setState({translations: result, loading: false}));
   }
 
@@ -69,6 +70,10 @@ class App extends Component {
       <div className="App" style={{direction: this.state.direction}}>
         <MuiThemeProvider muiTheme={this.state.muiTheme}>
           <div>
+            <AppBar
+              title="PanLex Translator"
+              showMenuIconButton={false}
+            />
             {DEBUG && [
               <RaisedButton
                 label="🔁"
@@ -90,12 +95,14 @@ class App extends Component {
                 direction={this.state.direction}
                 label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
                 interfaceLangvar={this.state.interfaceLangvar}
+                style={{flex: 1}}
               />
               <UidInput
                 onNewRequest={(item) => this.setState({ uidAl: item.text })}
                 direction={this.state.direction}
                 label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
                 interfaceLangvar={this.state.interfaceLangvar}
+                style={{flex: 0}}
               />
             </div>
             <TextField
