@@ -5,11 +5,16 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import AppBar from 'material-ui/AppBar';
-// import { Table, TableBody, TableRow, TableRowColumn } from 'material-ui/Table';
 import CircularProgress from 'material-ui/CircularProgress';
+import IconMenu from 'material-ui/IconMenu';
+import IconButton from 'material-ui/IconButton';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import MenuItem from 'material-ui/MenuItem';
+import SvgIcon from 'material-ui/SvgIcon';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import './App.css';
+import logo from './logo.svg';
 import { getTranslations } from './api';
 import UidInput from './UidInput';
 import TrnResult from './TrnResult';
@@ -27,7 +32,7 @@ class App extends Component {
         primary1Color: panlexRed,
       }
     })
-    let labelsToTranslate = ['lng', 'tra', 'al', 'de', 'txt', 'mod']
+    let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod']
     
     this.state = {
       muiTheme,
@@ -48,7 +53,11 @@ class App extends Component {
     .then((result) => {
       let output = {};
       for (let txt of Object.keys(this.state.labels)) {
-        output[txt] = result.filter(trn => (trn.trans_txt === txt))[0].txt
+        try {
+          output[txt] = result.filter(trn => (trn.trans_txt === txt))[0].txt;
+        } catch (e) {
+          output[txt] = txt;
+        }
       };
       this.setState({labels: output, interfaceLangvar: result[0].langvar});
     });
@@ -57,21 +66,46 @@ class App extends Component {
   getLabel = (label) => (this.state.labels[label]) ? this.state.labels[label] : label;
 
   translate = (event) => {
-    // let savedFakeExprs = this.state.fakeExprs.filter((fakeExpr) => fakeExpr.saved)
+    event.preventDefault();
     this.setState({loading: true})
-    // query('/fake_expr', {'uid': this.state.uid, 'state_size': 11 - this.state.chaos, 'count': 25})
     getTranslations(this.state.txt.trim(), this.state.uidDe, this.state.uidAl)
     .then((result) => this.setState({translations: result, loading: false}));
   }
 
   render() {
+    let originHorizontal = (this.state.direction === 'rtl') ? "left" : "right";
     this.state.muiTheme.isRtl = (this.state.direction === 'rtl');
     return (
       <div className="App" style={{direction: this.state.direction}}>
         <MuiThemeProvider muiTheme={this.state.muiTheme}>
           <div>
             <AppBar
-              title="PanLex Translator"
+              title={[this.getLabel('PanLex'), this.getLabel('tra')].join(' — ')}
+              iconElementRight={DEBUG && 
+                <IconMenu 
+                  iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
+                  anchorOrigin={{horizontal: originHorizontal, vertical: 'top'}}
+                  targetOrigin={{horizontal: originHorizontal, vertical: 'top'}}
+                >
+                  <MenuItem
+                    primaryText="🔁"
+                    onClick={() => this.setState({direction: (this.state.direction === 'rtl') ? 'ltr' : 'rtl'})}
+                  />
+                  {/* <MenuItem>
+                    <UidInput
+                      onNewRequest={(item) => {
+                    this.setState({ interfaceLang: item.text });
+                    this.setLabels();
+                      }}
+                      direction={this.state.direction}
+                      label={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
+                      interfaceLangvar={this.state.interfaceLangvar}
+                    />
+                  </MenuItem> */}
+                </IconMenu>
+              }
+              iconStyleRight={{margin: "8px -16px"}}
+              // iconElementLeft={<img src={logo} className="App-logo" alt="logo" />}
               showMenuIconButton={false}
             />
             {DEBUG && [
@@ -105,16 +139,20 @@ class App extends Component {
                 style={{flex: 0}}
               />
             </div>
-            <TextField
-              floatingLabelText={this.getLabel('txt')}
-              floatingLabelStyle={{transformOrigin: (this.state.direction === 'rtl') ? "right top 0px" : "left top 0px"}}
-              fullWidth={true}
-              onChange={(event, txt) => this.setState({txt})}
-            />
-            <RaisedButton
-              label={this.getLabel('tra')}
-              onClick={this.translate}
-            />
+            <form>
+              <TextField
+                floatingLabelText={this.getLabel('txt')}
+                floatingLabelStyle={{transformOrigin: (this.state.direction === 'rtl') ? "right top 0px" : "left top 0px"}}
+                fullWidth={true}
+                onChange={(event, txt) => this.setState({txt})}
+              />
+              <RaisedButton
+                type="submit"
+                label={this.getLabel('tra')}
+                primary={true}
+                onClick={this.translate}
+              />
+            </form>
             <div className="result">
               {(this.state.loading) ?
                 <div><CircularProgress/></div> :
