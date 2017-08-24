@@ -37,6 +37,7 @@ class App extends Component {
     let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod']
     
     this.state = {
+      windowWidth: window.innerWidth,
       muiTheme,
       loading: false,
       direction: 'ltr',
@@ -49,6 +50,14 @@ class App extends Component {
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
     }
     this.setLabels();
+  }
+
+  componentWillMount() {
+    window.addEventListener('resize', () => this.setState({windowWidth: window.innerWidth}));
+  }
+  
+  componentWillUnmount() {
+    window.removeEventListener('resize', () => this.setState({windowWidth: window.innerWidth}));
   }
 
   setLabels = () => {
@@ -137,7 +146,8 @@ class App extends Component {
                 interfaceLangvar={this.state.interfaceLangvar}
               />
             }
-            <div className="trn">
+            {DEBUG && this.state.windowWidth}
+            <div className="trn" style={{flexDirection: (this.state.windowWidth <= 840) ? 'column': 'row'}}>
               <div className="trn-box">
                 <div className="uid-box">
                   <UidInput
