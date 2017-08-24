@@ -52,7 +52,6 @@ export default class UidInput extends Component {
   render() {
     let originHorizontal = (this.props.direction === 'rtl') ? "right" : "left";
     return (
-      // <span style={{display: 'flex'}}>
       <span className="uid-input">
         <AutoComplete
           floatingLabelText={this.props.label}

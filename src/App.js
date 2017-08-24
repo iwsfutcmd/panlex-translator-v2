@@ -9,8 +9,10 @@ import CircularProgress from 'material-ui/CircularProgress';
 import IconMenu from 'material-ui/IconMenu';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import SwapHoriz from 'material-ui/svg-icons/action/swap-horiz';
 import MenuItem from 'material-ui/MenuItem';
-import SvgIcon from 'material-ui/SvgIcon';
+import {Card, CardText, CardTitle} from 'material-ui/Card';
+// import SvgIcon from 'material-ui/SvgIcon';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import './App.css';
@@ -41,6 +43,7 @@ class App extends Component {
       uidDe: '',
       uidAl: '',
       txt: '',
+      trnTxt: '',
       interfaceLang: 'eng-000',
       translations: [],
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
@@ -66,10 +69,25 @@ class App extends Component {
   getLabel = (label) => (this.state.labels[label]) ? this.state.labels[label] : label;
 
   translate = (event) => {
-    event.preventDefault();
-    this.setState({loading: true})
+    try {
+      event.preventDefault();
+    } catch (e) {}
+    this.setState({loading: true});
     getTranslations(this.state.txt.trim(), this.state.uidDe, this.state.uidAl)
-    .then((result) => this.setState({translations: result, loading: false}));
+    .then((result) => {
+      let trnTxt = result.length ? result[0].txt : '';
+      this.setState({trnTxt, translations: result, loading: false});
+    })
+  }
+
+  swapLng = (event) => {
+    let uidDeName = this.refs.uidDe.state.searchText;
+    this.refs.uidDe.setState({searchText: this.refs.uidAl.state.searchText});
+    this.refs.uidAl.setState({searchText: uidDeName});
+
+    let uidDe = this.state.uidAl;
+    let uidAl = this.state.uidDe;
+    this.setState({uidDe, uidAl, txt: this.state.trnTxt}, this.translate);
   }
 
   render() {
@@ -81,7 +99,7 @@ class App extends Component {
           <div>
             <AppBar
               title={[this.getLabel('PanLex'), this.getLabel('tra')].join(' — ')}
-              iconElementRight={DEBUG && 
+              iconElementRight={
                 <IconMenu 
                   iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
                   anchorOrigin={{horizontal: originHorizontal, vertical: 'top'}}
@@ -108,11 +126,7 @@ class App extends Component {
               // iconElementLeft={<img src={logo} className="App-logo" alt="logo" />}
               showMenuIconButton={false}
             />
-            {DEBUG && [
-              <RaisedButton
-                label="🔁"
-                onClick={() => this.setState({direction: (this.state.direction === 'rtl') ? 'ltr' : 'rtl'})}
-              />,
+            {DEBUG && 
               <UidInput
                 onNewRequest={(item) => {
                   this.setState({ interfaceLang: item.text });
@@ -121,46 +135,84 @@ class App extends Component {
                 direction={this.state.direction}
                 label={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
                 interfaceLangvar={this.state.interfaceLangvar}
-              />]
+              />
             }
-            <div className="langvar-select">
-              <UidInput
-                onNewRequest={(item) => this.setState({ uidDe: item.text })}
-                direction={this.state.direction}
-                label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
-                interfaceLangvar={this.state.interfaceLangvar}
-                style={{flex: 1}}
-              />
-              <UidInput
-                onNewRequest={(item) => this.setState({ uidAl: item.text })}
-                direction={this.state.direction}
-                label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
-                interfaceLangvar={this.state.interfaceLangvar}
-                style={{flex: 0}}
-              />
-            </div>
-            <form>
-              <TextField
-                floatingLabelText={this.getLabel('txt')}
-                floatingLabelStyle={{transformOrigin: (this.state.direction === 'rtl') ? "right top 0px" : "left top 0px"}}
-                fullWidth={true}
-                onChange={(event, txt) => this.setState({txt})}
-              />
-              <RaisedButton
-                type="submit"
-                label={this.getLabel('tra')}
-                primary={true}
-                onClick={this.translate}
-              />
-            </form>
-            <div className="result">
-              {(this.state.loading) ?
-                <div><CircularProgress/></div> :
-                <TrnResult
-                  muiTheme={this.state.muiTheme}
-                  direction={this.state.direction}
-                  translations={this.state.translations}/>
-              }
+            <div className="trn">
+              <div className="trn-box">
+                <div className="uid-box">
+                  <UidInput
+                    ref="uidDe"
+                    onNewRequest={(item) => this.setState({ uidDe: item.text })}
+                    direction={this.state.direction}
+                    label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
+                    interfaceLangvar={this.state.interfaceLangvar}
+                    // style={{flex: 1}}
+                  />
+                  <RaisedButton
+                    icon={<SwapHoriz/>}
+                    style={{minWidth: 36}}
+                    onClick={this.swapLng}
+                  />
+                </div>
+                <Card>
+                  <CardText>
+                    <form id="trn-txt">
+                      <TextField
+                        // floatingLabelText={this.getLabel('txt')}
+                        // floatingLabelStyle={{transformOrigin: (this.state.direction === 'rtl') ? "right top 0px" : "left top 0px"}}
+                        hintText={this.getLabel('txt')}
+                        fullWidth={true}
+                        onChange={(event, txt) => this.setState({txt})}
+                        value={this.state.txt}
+                        // multiLine={true}
+                      />
+                    </form>
+                  </CardText>
+                </Card>
+              </div>
+              <div className="trn-box">
+                <div className="uid-box">
+                  <UidInput
+                    ref="uidAl"
+                    onNewRequest={(item) => this.setState({ uidAl: item.text })}
+                    direction={this.state.direction}
+                    label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
+                    interfaceLangvar={this.state.interfaceLangvar}
+                    // style={{flex: 0}}
+                  />
+                  <RaisedButton
+                    type="submit"
+                    label={this.getLabel('tra')}
+                    primary={true}
+                    onClick={this.translate}
+                    form="trn-txt"
+                  />
+                </div>
+                {/* <TextField
+                  fullWidth={true}
+                  disabled={true}
+                  // multiLine={true}
+                /> */}
+                <Card
+                  // showExpandableButton={Boolean(this.state.translations && this.state.translations.length)}
+                >
+                  <CardTitle
+                    className="trn-title"
+                    title={this.state.trnTxt}
+                    actAsExpander={true}
+                    showExpandableButton={Boolean(this.state.trnTxt)}
+                  >
+                    {this.state.loading ? <CircularProgress/> : ''}
+                  </CardTitle>
+                  <CardText expandable={true}>
+                    <TrnResult
+                      muiTheme={this.state.muiTheme}
+                      direction={this.state.direction}
+                      translations={this.state.translations}
+                    />
+                  </CardText>
+                </Card>
+              </div>
             </div>
           </div>
         </MuiThemeProvider>

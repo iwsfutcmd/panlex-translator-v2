@@ -1,14 +1,41 @@
 .App {
   margin: 0px auto;
-  padding: 0px 16px;
-  text-align: center;
-  max-width: 480px;
+  /*padding: 0px 16px;*/
+  /*text-align: center;*/
+  /*max-width: 480px;*/
 }
 
-.langvar-select {
+.trn {
   display: flex;
+  padding: 14px 24px;
 }
+
+.trn-box {
+  flex: auto;
+  margin: 0px 4px;
+  flex-basis: 0;
+}
+
+.uid-box {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+/*.langvar-select {
+  display: flex;
+}*/
 
 .result {
   margin-top: 16px;
+}
+
+.trn-title {
+  display: flex;
+  justify-content: space-between;
+}
+
+.trn-title button {
+  margin: unset !important;
+  position: unset !important;
 }
