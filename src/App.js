@@ -4,16 +4,10 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import AppBar from 'material-ui/AppBar';
 import CircularProgress from 'material-ui/CircularProgress';
-import IconMenu from 'material-ui/IconMenu';
-import IconButton from 'material-ui/IconButton';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import SwapHoriz from 'material-ui/svg-icons/action/swap-horiz';
 import SwapVert from 'material-ui/svg-icons/action/swap-vert';
-import MenuItem from 'material-ui/MenuItem';
 import {Card, CardText, CardTitle} from 'material-ui/Card';
-import Dialog from 'material-ui/Dialog';
 
 // import SvgIcon from 'material-ui/SvgIcon';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -21,8 +15,8 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import './App.css';
 import logo from './logo.svg';
 import { getTranslations } from './api';
-import UidInput from './UidInput';
 import UidInputChipped from './UidInputChipped';
+import PanLexAppBar from './PanLexAppBar';
 import TrnResult from './TrnResult';
 
 const panlexRed = '#A60A0A';
@@ -116,50 +110,24 @@ class App extends Component {
   }
 
   render() {
-    let originHorizontal = (this.state.direction === 'rtl') ? "left" : "right";
     this.state.muiTheme.isRtl = (this.state.direction === 'rtl');
     return (
       <div className="App" style={{direction: this.state.direction}}>
         <MuiThemeProvider muiTheme={this.state.muiTheme}>
           <div>
-            <AppBar
+            <PanLexAppBar 
+              direction={this.state.direction}
               title={[this.getLabel('PanLex'), this.getLabel('tra')].join(' — ')}
-              iconElementRight={
-                <IconMenu 
-                  iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
-                  anchorOrigin={{horizontal: originHorizontal, vertical: 'top'}}
-                  targetOrigin={{horizontal: originHorizontal, vertical: 'top'}}
-                >
-                  <MenuItem
-                    primaryText="🔁"
-                    onClick={() => this.setState({direction: (this.state.direction === 'rtl') ? 'ltr' : 'rtl'})}
-                  />
-                  <MenuItem
-                    primaryText={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
-                    onClick={() => this.setState({interfaceLangDialogOpen: true})}
-                  />
-                </IconMenu>
-              }
-              iconStyleRight={{margin: "8px -16px"}}
-              // iconElementLeft={<img src={logo} className="App-logo" alt="logo" />}
-              showMenuIconButton={false}
+              lngModLabel={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
+              switchDirection={() => this.setState({direction: (this.state.direction === 'rtl') ? 'ltr' : 'rtl'})}
+              setInterfaceLang={(lang) => {
+                this.setState({ 
+                  interfaceLang: lang.uid,
+                });
+                this.setLabels(lang.uid);
+              }}
+              interfaceLangvar={this.state.interfaceLangvar}
             />
-            <Dialog
-              open={this.state.interfaceLangDialogOpen}
-            >
-              <UidInput
-                onNewRequest={(item) => {
-                  this.setState({ 
-                      interfaceLang: item.uid,
-                      interfaceLangDialogOpen: false,
-                  });
-                  this.setLabels(item.uid);
-                }}
-                direction={this.state.direction}
-                label={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
-                interfaceLangvar={this.state.interfaceLangvar}
-              />
-            </Dialog>
             <div className="trn" style={{flexDirection: this.state.compact ? 'column': 'row'}}>
               <div className="trn-box">
                 <div className="uid-box">
@@ -169,6 +137,7 @@ class App extends Component {
                     direction={this.state.direction}
                     label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
                     interfaceLangvar={this.state.interfaceLangvar}
+                    compact={this.state.compact}
                   />
                   <RaisedButton
                     icon={this.state.compact ? <SwapVert/> : <SwapHoriz/>}
@@ -197,6 +166,7 @@ class App extends Component {
                     direction={this.state.direction}
                     label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
                     interfaceLangvar={this.state.interfaceLangvar}
+                    compact={this.state.compact}
                   />
                   <RaisedButton
                     style={{minWidth: 'unset'}}

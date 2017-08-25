@@ -6,24 +6,18 @@ import UidInput from './UidInput';
 import './UidInputChipped.css';
 
 class UidInputChipped extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      langList: [{}],
-    }
-  }
-  
   selectPrevLang = (event, index) => {
     let langList = this.props.langList.slice();
     let selectedLang = langList.splice(index, 1)[0];
-    // console.log(langList, selectedLang)
-    this.setState({langList: [selectedLang, ...langList]})
     this.props.onSelectLang([selectedLang, ...langList]);
   }
   
   render() {
     return (
-      <span className="uid-input-chipped">
+      <span 
+        className="uid-input-chipped"
+        style={{flexDirection: this.props.compact ? 'column-reverse' : 'row'}}
+      >
         <span className="chips">
           {(this.props.langList.length > 0) &&
             <Chip
@@ -44,13 +38,10 @@ class UidInputChipped extends Component {
           }
         </span>
         <UidInput
-          align="end"
+          align={this.props.compact ? "start" : "end"}
           style={{margin: "0 8px"}}
           onNewRequest={(item) => {
             let selectedLang = {uid: item.uid, name: item.text};
-            this.setState(prevState => ({
-              langList: [selectedLang, ...prevState.langList],
-            }));
             this.props.onSelectLang([selectedLang, ...this.props.langList]);
           }}
           direction={this.props.direction}
