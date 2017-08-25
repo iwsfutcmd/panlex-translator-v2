@@ -50,7 +50,12 @@ export default class UidInput extends Component {
   }
   
   render() {
-    let originHorizontal = (this.props.direction === 'rtl') ? "left" : "right";
+    let originHorizontal;
+    if (this.props.align === 'end') {
+      originHorizontal = (this.props.direction === 'rtl') ? "left" : "right";
+    } else {
+      originHorizontal = (this.props.direction === 'rtl') ? "right" : "left";
+    }
     return (
       <span className="uid-input" style={this.props.style}>
         {this.state.loading && <CircularProgress className="loading"/>}

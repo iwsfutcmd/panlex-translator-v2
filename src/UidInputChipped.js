@@ -44,6 +44,7 @@ class UidInputChipped extends Component {
           }
         </span>
         <UidInput
+          align="end"
           style={{margin: "0 8px"}}
           onNewRequest={(item) => {
             let selectedLang = {uid: item.uid, name: item.text};
