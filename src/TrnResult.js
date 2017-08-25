@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 
 import { Table, TableBody, TableRow, TableRowColumn } from 'material-ui/Table';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 import './TrnResult.css';
 
-export default class TrnResult extends Component {
+class TrnResult extends Component {
   render() {
     let maxBon = (this.props.translations.length) ? this.props.translations[0].trans_quality : 1;
     return (
@@ -39,3 +40,4 @@ export default class TrnResult extends Component {
   }
 }
 
+export default muiThemeable()(TrnResult);

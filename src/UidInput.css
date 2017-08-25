@@ -1,10 +1,6 @@
 .uid-input {
-  /*width: 100%;*/
   display: flex;
-}
-
-.uid-item {
-  /*margin-bottom: 1em;*/
+  justify-content: flex-end;
 }
 
 .uid-line {
@@ -16,12 +12,17 @@
   justify-content: space-between;
 }
 
+.uid-name {
+  margin-inline-end: 8px;
+}
+
 .uid-alt {
-  margin-inline-start: 1em;
+  margin-inline-start: 8px;
   font-size: small;
   color: darkgray;
 }
 
 .loading {
-  align-self: flex-end;
+  align-self: center;
+  position: absolute !important;
 }

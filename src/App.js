@@ -10,8 +10,11 @@ import IconMenu from 'material-ui/IconMenu';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import SwapHoriz from 'material-ui/svg-icons/action/swap-horiz';
+import SwapVert from 'material-ui/svg-icons/action/swap-vert';
 import MenuItem from 'material-ui/MenuItem';
 import {Card, CardText, CardTitle} from 'material-ui/Card';
+import Dialog from 'material-ui/Dialog';
+
 // import SvgIcon from 'material-ui/SvgIcon';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
@@ -19,14 +22,17 @@ import './App.css';
 import logo from './logo.svg';
 import { getTranslations } from './api';
 import UidInput from './UidInput';
+import UidInputChipped from './UidInputChipped';
 import TrnResult from './TrnResult';
 
 const panlexRed = '#A60A0A';
+const compactWidth = 840
 injectTapEventPlugin();
 
 const DEBUG = false;
 
 class App extends Component {
+
   constructor(props) {
     super(props);
     const muiTheme = getMuiTheme({
@@ -37,31 +43,39 @@ class App extends Component {
     let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod']
     
     this.state = {
-      windowWidth: window.innerWidth,
+      compact: window.innerWidth <= compactWidth,
       muiTheme,
       loading: false,
       direction: 'ltr',
       uidDe: '',
+      langsDe: [],
       uidAl: '',
+      langsAl: [],
       txt: '',
       trnTxt: '',
-      interfaceLang: 'eng-000',
+      // interfaceLang: 'eng-000',
+      interfaceLangDialogOpen: false,
       translations: [],
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
     }
-    this.setLabels();
+    // this.setLabels();
   }
 
+
   componentWillMount() {
-    window.addEventListener('resize', () => this.setState({windowWidth: window.innerWidth}));
+    window.addEventListener('resize', () => this.setState({compact: window.innerWidth <= compactWidth}));
   }
-  
+
+  componentDidMount() {
+    this.setLabels('eng-000');
+  }
+
   componentWillUnmount() {
     window.removeEventListener('resize', () => this.setState({windowWidth: window.innerWidth}));
   }
 
-  setLabels = () => {
-    getTranslations(Object.keys(this.state.labels), 'art-000', this.state.interfaceLang)
+  setLabels = (uid) => {
+    getTranslations(Object.keys(this.state.labels), 'art-000', uid)
     .then((result) => {
       let output = {};
       for (let txt of Object.keys(this.state.labels)) {
@@ -71,7 +85,7 @@ class App extends Component {
           output[txt] = txt;
         }
       };
-      this.setState({labels: output, interfaceLangvar: result[0].langvar});
+      this.setState({labels: output, interfaceLangvar: result.length ? result[0].langvar : 0});
     });
   };
 
@@ -82,21 +96,23 @@ class App extends Component {
       event.preventDefault();
     } catch (e) {}
     this.setState({loading: true});
-    getTranslations(this.state.txt.trim(), this.state.uidDe, this.state.uidAl)
-    .then((result) => {
-      let trnTxt = result.length ? result[0].txt : '';
-      this.setState({trnTxt, translations: result, loading: false});
-    })
+    if (this.state.txt.trim() && this.state.langsDe.length && this.state.langsAl.length) {
+      getTranslations(this.state.txt.trim(), this.state.langsDe[0].uid, this.state.langsAl[0].uid)
+        .then((result) => {
+          let trnTxt = result.length ? result[0].txt : '';
+          this.setState({trnTxt, translations: result, loading: false});
+        })
+    } else {
+      this.setState({loading: false});
+    }
   }
 
   swapLng = (event) => {
-    let uidDeName = this.refs.uidDe.state.searchText;
-    this.refs.uidDe.setState({searchText: this.refs.uidAl.state.searchText});
-    this.refs.uidAl.setState({searchText: uidDeName});
-
-    let uidDe = this.state.uidAl;
-    let uidAl = this.state.uidDe;
-    this.setState({uidDe, uidAl, txt: this.state.trnTxt}, this.translate);
+    this.setState(prevState => ({
+      langsDe: prevState.langsAl,
+      langsAl: prevState.langsDe,
+      txt: prevState.trnTxt}),
+      this.translate);
   }
 
   render() {
@@ -118,48 +134,44 @@ class App extends Component {
                     primaryText="🔁"
                     onClick={() => this.setState({direction: (this.state.direction === 'rtl') ? 'ltr' : 'rtl'})}
                   />
-                  {/* <MenuItem>
-                    <UidInput
-                      onNewRequest={(item) => {
-                    this.setState({ interfaceLang: item.text });
-                    this.setLabels();
-                      }}
-                      direction={this.state.direction}
-                      label={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
-                      interfaceLangvar={this.state.interfaceLangvar}
-                    />
-                  </MenuItem> */}
+                  <MenuItem
+                    primaryText={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
+                    onClick={() => this.setState({interfaceLangDialogOpen: true})}
+                  />
                 </IconMenu>
               }
               iconStyleRight={{margin: "8px -16px"}}
               // iconElementLeft={<img src={logo} className="App-logo" alt="logo" />}
               showMenuIconButton={false}
             />
-            {DEBUG && 
+            <Dialog
+              open={this.state.interfaceLangDialogOpen}
+            >
               <UidInput
                 onNewRequest={(item) => {
-                  this.setState({ interfaceLang: item.text });
-                  this.setLabels();
+                  this.setState({ 
+                      interfaceLang: item.uid,
+                      interfaceLangDialogOpen: false,
+                  });
+                  this.setLabels(item.uid);
                 }}
                 direction={this.state.direction}
                 label={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
                 interfaceLangvar={this.state.interfaceLangvar}
               />
-            }
-            {DEBUG && this.state.windowWidth}
-            <div className="trn" style={{flexDirection: (this.state.windowWidth <= 840) ? 'column': 'row'}}>
+            </Dialog>
+            <div className="trn" style={{flexDirection: this.state.compact ? 'column': 'row'}}>
               <div className="trn-box">
                 <div className="uid-box">
-                  <UidInput
-                    ref="uidDe"
-                    onNewRequest={(item) => this.setState({ uidDe: item.text })}
+                  <UidInputChipped
+                    langList={this.state.langsDe}
+                    onSelectLang={(langList) => this.setState({langsDe: langList, uidDe: langList[0].uid})}
                     direction={this.state.direction}
                     label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
                     interfaceLangvar={this.state.interfaceLangvar}
-                    // style={{flex: 1}}
                   />
                   <RaisedButton
-                    icon={<SwapHoriz/>}
+                    icon={this.state.compact ? <SwapVert/> : <SwapHoriz/>}
                     style={{minWidth: 36}}
                     onClick={this.swapLng}
                   />
@@ -168,13 +180,10 @@ class App extends Component {
                   <CardText>
                     <form id="trn-txt">
                       <TextField
-                        // floatingLabelText={this.getLabel('txt')}
-                        // floatingLabelStyle={{transformOrigin: (this.state.direction === 'rtl') ? "right top 0px" : "left top 0px"}}
                         hintText={this.getLabel('txt')}
                         fullWidth={true}
                         onChange={(event, txt) => this.setState({txt})}
                         value={this.state.txt}
-                        // multiLine={true}
                       />
                     </form>
                   </CardText>
@@ -182,15 +191,15 @@ class App extends Component {
               </div>
               <div className="trn-box">
                 <div className="uid-box">
-                  <UidInput
-                    ref="uidAl"
-                    onNewRequest={(item) => this.setState({ uidAl: item.text })}
+                  <UidInputChipped
+                    langList={this.state.langsAl}
+                    onSelectLang={(langList) => this.setState({langsAl: langList, uidAl: langList[0].uid})}
                     direction={this.state.direction}
                     label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
                     interfaceLangvar={this.state.interfaceLangvar}
-                    // style={{flex: 0}}
                   />
                   <RaisedButton
+                    style={{minWidth: 'unset'}}
                     type="submit"
                     label={this.getLabel('tra')}
                     primary={true}
@@ -198,14 +207,7 @@ class App extends Component {
                     form="trn-txt"
                   />
                 </div>
-                {/* <TextField
-                  fullWidth={true}
-                  disabled={true}
-                  // multiLine={true}
-                /> */}
-                <Card
-                  // showExpandableButton={Boolean(this.state.translations && this.state.translations.length)}
-                >
+                <Card>
                   <CardTitle
                     className="trn-title"
                     title={this.state.trnTxt}
@@ -216,7 +218,6 @@ class App extends Component {
                   </CardTitle>
                   <CardText expandable={true}>
                     <TrnResult
-                      muiTheme={this.state.muiTheme}
                       direction={this.state.direction}
                       translations={this.state.translations}
                     />

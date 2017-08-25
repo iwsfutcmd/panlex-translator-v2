@@ -1,0 +1,20 @@
+.uid-input-chipped {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.chips {
+  display: flex;
+  overflow: hidden;
+}
+
+.lng-chip {
+  height: 100%;
+  margin: 4px !important;
+}
+
+#uid-input-internal {
+  margin: 8px;
+}
