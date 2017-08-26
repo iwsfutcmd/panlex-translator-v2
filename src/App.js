@@ -8,18 +8,17 @@ import CircularProgress from 'material-ui/CircularProgress';
 import SwapHoriz from 'material-ui/svg-icons/action/swap-horiz';
 import SwapVert from 'material-ui/svg-icons/action/swap-vert';
 import {Card, CardText, CardTitle} from 'material-ui/Card';
-
-// import SvgIcon from 'material-ui/SvgIcon';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+
+import debounce from 'lodash/debounce';
 
 import './App.css';
 import logo from './logo.svg';
-import { getTranslations } from './api';
+import { query, getTranslations } from './api';
 import UidInputChipped from './UidInputChipped';
 import PanLexAppBar from './PanLexAppBar';
 import TrnResult from './TrnResult';
 
-const panlexRed = '#A60A0A';
 const compactWidth = 840
 injectTapEventPlugin();
 
@@ -31,10 +30,15 @@ class App extends Component {
     super(props);
     const muiTheme = getMuiTheme({
       palette: {
-        primary1Color: panlexRed,
+        primary1Color: "#A60A0A",
+        primary2Color: "#DF4A34",
+        primary3Color: "#700000",
+        accent1Color: "#424242",
+        accent2Color: "#6d6d6d",
+        accent3Color: "#1b1b1b",
       }
     })
-    let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod']
+    let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod', 'npo']
     
     this.state = {
       compact: window.innerWidth <= compactWidth,
@@ -46,8 +50,8 @@ class App extends Component {
       uidAl: '',
       langsAl: [],
       txt: '',
+      txtError: false,
       trnTxt: '',
-      // interfaceLang: 'eng-000',
       interfaceLangDialogOpen: false,
       translations: [],
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
@@ -84,6 +88,15 @@ class App extends Component {
   };
 
   getLabel = (label) => (this.state.labels[label]) ? this.state.labels[label] : label;
+
+  validateTxt = debounce((txt) => {
+    if (txt.trim() && this.state.langsDe.length) {
+      query('/expr', {uid: this.state.langsDe[0].uid, txt: txt.trim()})
+        .then((response) => {
+          this.setState({txtError: !response.result.length})
+        })
+    }
+  }, 200)
 
   translate = (event) => {
     try {
@@ -151,8 +164,12 @@ class App extends Component {
                       <TextField
                         hintText={this.getLabel('txt')}
                         fullWidth={true}
-                        onChange={(event, txt) => this.setState({txt})}
+                        onChange={(event, txt) => {
+                          this.setState({txt});
+                          this.validateTxt(txt);
+                        }}
                         value={this.state.txt}
+                        errorText={this.state.txtError ? this.getLabel('npo') : ""}
                       />
                     </form>
                   </CardText>

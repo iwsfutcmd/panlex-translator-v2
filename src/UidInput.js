@@ -4,6 +4,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import MenuItem from 'material-ui/MenuItem';
 import CircularProgress from 'material-ui/CircularProgress';
 
+import debounce from 'lodash/debounce';
 import { query } from './api';
 import './UidInput.css';
 
@@ -17,8 +18,8 @@ export default class UidInput extends Component {
     }
   }
   
-  getSuggestions = (txt) => {
-    this.setState({loading: true, searchText: txt});
+  getSuggestions = debounce((txt) => {
+    this.setState({loading: true});
     query('/suggest/langvar', {'txt': txt, 'pref_trans_langvar': this.props.interfaceLangvar})
     .then((response) => {
       this.setState({loading: false});
@@ -47,7 +48,7 @@ export default class UidInput extends Component {
         this.setState({ suggestions: []});
       }
     });
-  }
+  }, 500);
   
   render() {
     let originHorizontal;
@@ -59,16 +60,19 @@ export default class UidInput extends Component {
     return (
       <span className="uid-input" style={this.props.style}>
         {this.state.loading && <CircularProgress className="loading"/>}
-        {/* <CircularProgress className="loading" size={20}/> */}
         <AutoComplete
           floatingLabelText={this.props.label}
           floatingLabelStyle={{transformOrigin: (this.props.direction === 'rtl') ? "right top 0px" : "left top 0px"}}
           searchText={this.state.searchText}
           filter={AutoComplete.noFilter}
           dataSource={this.state.suggestions}
-          onUpdateInput={this.getSuggestions}
+          onUpdateInput={(txt) => {
+            this.setState({searchText: txt});
+            this.getSuggestions(txt);
+          }}
           onNewRequest={(suggestion) => {
             this.setState({searchText: ''});
+            console.log(this.state.searchText);
             this.props.onNewRequest(suggestion);
           }}
           fullWidth={true}

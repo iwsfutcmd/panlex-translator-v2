@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Chip from 'material-ui/Chip';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 
+import uniqBy from 'lodash/uniqBy'
+
 import UidInput from './UidInput';
 import './UidInputChipped.css';
 
@@ -9,7 +11,7 @@ class UidInputChipped extends Component {
   selectPrevLang = (event, index) => {
     let langList = this.props.langList.slice();
     let selectedLang = langList.splice(index, 1)[0];
-    this.props.onSelectLang([selectedLang, ...langList]);
+    this.props.onSelectLang(uniqBy([selectedLang, ...langList], 'uid'));
   }
   
   render() {
@@ -22,7 +24,7 @@ class UidInputChipped extends Component {
           {(this.props.langList.length > 0) &&
             <Chip
               className="lng-chip"
-              backgroundColor={this.props.muiTheme.palette.primary1Color}
+              backgroundColor={this.props.muiTheme.palette.accent1Color}
               labelColor={this.props.muiTheme.palette.alternateTextColor}
             >
               {this.props.langList[0].name}
@@ -42,7 +44,7 @@ class UidInputChipped extends Component {
           style={{margin: "0 8px"}}
           onNewRequest={(item) => {
             let selectedLang = {uid: item.uid, name: item.text};
-            this.props.onSelectLang([selectedLang, ...this.props.langList]);
+            this.props.onSelectLang(uniqBy([selectedLang, ...this.props.langList], 'uid'));
           }}
           direction={this.props.direction}
           label={this.props.label}
