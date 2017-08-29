@@ -5,6 +5,7 @@
 .trn {
   display: flex;
   padding: 0px 20px;
+  flex-direction: row;
 }
 
 .trn-box {
@@ -17,6 +18,27 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+}
+
+.uid-box-button {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-inline-start: 4px;
+}
+
+@media (max-width: 840px) {
+  .trn {
+    flex-direction: column;
+  }
+  
+  .uid-box {
+    flex-direction: column-reverse;
+  }
+  
+  .uid-box-button {
+    width: 100%;
+  }
 }
 
 .result {

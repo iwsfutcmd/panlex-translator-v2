@@ -1,0 +1,11 @@
+.chips {
+  display: flex;
+  overflow: hidden;
+  /*flex-direction: row;*/
+  /*width: 100%;*/
+}
+
+.lng-chip {
+  height: 100%;
+  margin: 4px !important;
+}

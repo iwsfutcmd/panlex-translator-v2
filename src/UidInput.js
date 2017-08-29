@@ -72,7 +72,6 @@ export default class UidInput extends Component {
           }}
           onNewRequest={(suggestion) => {
             this.setState({searchText: ''});
-            console.log(this.state.searchText);
             this.props.onNewRequest(suggestion);
           }}
           fullWidth={true}

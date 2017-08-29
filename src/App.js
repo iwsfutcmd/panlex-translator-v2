@@ -8,14 +8,18 @@ import CircularProgress from 'material-ui/CircularProgress';
 import SwapHoriz from 'material-ui/svg-icons/action/swap-horiz';
 import SwapVert from 'material-ui/svg-icons/action/swap-vert';
 import {Card, CardText, CardTitle} from 'material-ui/Card';
+import Subheader from 'material-ui/Subheader';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import debounce from 'lodash/debounce';
+import uniqBy from 'lodash/uniqBy'
 
 import './App.css';
 import logo from './logo.svg';
 import { query, getTranslations } from './api';
-import UidInputChipped from './UidInputChipped';
+// import UidInputChipped from './UidInputChipped';
+import UidChips from './UidChips';
+import UidInput from './UidInput';
 import PanLexAppBar from './PanLexAppBar';
 import TrnResult from './TrnResult';
 
@@ -45,9 +49,7 @@ class App extends Component {
       muiTheme,
       loading: false,
       direction: 'ltr',
-      uidDe: '',
-      langsDe: [],
-      uidAl: '',
+      langsDe: DEBUG ? [{uid: 'eng-000', name: 'English'}, {uid: 'xxx-000', name: 'Blahblahblah'}, {uid: 'yyy-000', name: 'Blahblahblah'}] : [],
       langsAl: [],
       txt: '',
       txtError: false,
@@ -89,9 +91,9 @@ class App extends Component {
 
   getLabel = (label) => (this.state.labels[label]) ? this.state.labels[label] : label;
 
-  validateTxt = debounce((txt) => {
-    if (txt.trim() && this.state.langsDe.length) {
-      query('/expr', {uid: this.state.langsDe[0].uid, txt: txt.trim()})
+  validateTxt = debounce(() => {
+    if (this.state.txt.trim() && this.state.langsDe.length) {
+      query('/expr', {uid: this.state.langsDe[0].uid, txt: this.state.txt.trim()})
         .then((response) => {
           this.setState({txtError: !response.result.length})
         })
@@ -141,22 +143,32 @@ class App extends Component {
               }}
               interfaceLangvar={this.state.interfaceLangvar}
             />
-            <div className="trn" style={{flexDirection: this.state.compact ? 'column': 'row'}}>
+            <div className="trn">
               <div className="trn-box">
+                {/* <Subheader>
+                  {[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
+                </Subheader> */}
                 <div className="uid-box">
-                  <UidInputChipped
+                  <UidChips
                     langList={this.state.langsDe}
-                    onSelectLang={(langList) => this.setState({langsDe: langList, uidDe: langList[0].uid})}
-                    direction={this.state.direction}
-                    label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
-                    interfaceLangvar={this.state.interfaceLangvar}
-                    compact={this.state.compact}
+                    onSelectLang={(langList) => this.setState({langsDe: langList}, () => {this.translate(); this.validateTxt()})}
                   />
-                  <RaisedButton
-                    icon={this.state.compact ? <SwapVert/> : <SwapHoriz/>}
-                    style={{minWidth: 36}}
-                    onClick={this.swapLng}
-                  />
+                  <div className="uid-box-button">
+                    <UidInput
+                      onNewRequest={(item) => {
+                        let selectedLang = {uid: item.uid, name: item.text};
+                        this.setState({langsDe: uniqBy([selectedLang, ...this.state.langsDe], 'uid')}, () => {this.translate(); this.validateTxt()});
+                      }}
+                      label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
+                      interfaceLangvar={this.state.interfaceLangvar}
+                      align={this.state.compact ? "start" : "end"}
+                    />
+                    <RaisedButton
+                      icon={this.state.compact ? <SwapVert/> : <SwapHoriz/>}
+                      style={{minWidth: 36}}
+                      onClick={this.swapLng}
+                    />
+                  </div>
                 </div>
                 <Card>
                   <CardText>
@@ -165,8 +177,7 @@ class App extends Component {
                         hintText={this.getLabel('txt')}
                         fullWidth={true}
                         onChange={(event, txt) => {
-                          this.setState({txt});
-                          this.validateTxt(txt);
+                          this.setState({txt}, this.validateTxt);
                         }}
                         value={this.state.txt}
                         errorText={this.state.txtError ? this.getLabel('npo') : ""}
@@ -176,23 +187,33 @@ class App extends Component {
                 </Card>
               </div>
               <div className="trn-box">
+                {/* <Subheader>
+                  {[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
+                </Subheader> */}
                 <div className="uid-box">
-                  <UidInputChipped
+                  <UidChips
                     langList={this.state.langsAl}
-                    onSelectLang={(langList) => this.setState({langsAl: langList, uidAl: langList[0].uid})}
-                    direction={this.state.direction}
-                    label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
-                    interfaceLangvar={this.state.interfaceLangvar}
-                    compact={this.state.compact}
+                    onSelectLang={(langList) => this.setState({langsAl: langList}, this.translate)}
                   />
-                  <RaisedButton
-                    style={{minWidth: 'unset'}}
-                    type="submit"
-                    label={this.getLabel('tra')}
-                    primary={true}
-                    onClick={this.translate}
-                    form="trn-txt"
-                  />
+                  <div className="uid-box-button">
+                    <UidInput
+                      onNewRequest={(item) => {
+                        let selectedLang = {uid: item.uid, name: item.text};
+                        this.setState({langsAl: uniqBy([selectedLang, ...this.state.langsAl], 'uid')}, this.translate);
+                      }}
+                      label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
+                      interfaceLangvar={this.state.interfaceLangvar}
+                      align={this.state.compact ? "start" : "end"}
+                    />
+                    <RaisedButton
+                      style={{minWidth: 'unset'}}
+                      type="submit"
+                      label={this.getLabel('tra')}
+                      primary={true}
+                      onClick={this.translate}
+                      form="trn-txt"
+                    />
+                  </div>
                 </div>
                 <Card>
                   <CardTitle
