@@ -9,7 +9,7 @@ class UidChips extends Component {
   selectPrevLang = (event, index) => {
     let langList = this.props.langList.slice();
     let selectedLang = langList.splice(index, 1)[0];
-    this.props.onSelectLang([selectedLang, ...langList], 'uid');
+    this.props.onSelectLang([selectedLang, ...langList]);
   }
     
   render() {
@@ -26,18 +26,13 @@ class UidChips extends Component {
         }
         {(this.props.langList.length > 1) &&
           this.props.langList.slice(1).map((lang, index) => (
-            <VisibilitySensor key={index+1}
-              containment={this.refs.chips}
+            <Chip
+              key={index+1}
+              className="lng-chip"
+              onClick={(event) => this.selectPrevLang(event, index+1)}
             >
-              {({isVisibile}) =>
-                <Chip
-                  className="lng-chip"
-                  onClick={(event) => this.selectPrevLang(event, index+1)}
-                >
-                  {lang.name}
-                </Chip>
-              }
-            </VisibilitySensor>
+              {lang.name}
+            </Chip>
           ))
         }
       </span>

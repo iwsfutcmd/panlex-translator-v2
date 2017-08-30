@@ -1,5 +1,5 @@
 .App {
-  margin: 0px auto;
+  /*margin: 0px auto;*/
 }
 
 .trn {
@@ -10,35 +10,47 @@
 
 .trn-box {
   flex: auto;
-  margin: 0px 8px;
-  flex-basis: 0;
+  padding: 0px 8px;
+  box-sizing: border-box;
+  width: 50%;
+}
+
+.trn-card {
+  margin: 4px 0px;
 }
 
 .uid-box {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  flex-direction: column;
 }
 
 .uid-box-button {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-inline-start: 4px;
+  /*margin-inline-start: 4px;*/
+  width: 100%
 }
 
 @media (max-width: 840px) {
   .trn {
     flex-direction: column;
+    padding: 0px 12px;
   }
   
-  .uid-box {
-    flex-direction: column-reverse;
-  }
-  
-  .uid-box-button {
+  .trn-box {
     width: 100%;
   }
+  /*
+  .uid-box {
+    flex-direction: column-reverse;
+  }*/
+  
+  /*.uid-box-button {
+    width: 100%;
+  }*/
 }
 
 .result {
