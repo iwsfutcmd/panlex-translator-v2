@@ -13,7 +13,6 @@ import UidInput from './UidInput';
 const Menu = (props) => (
   <div style={{display: 'flex', alignItems: 'center'}}>
     <RaisedButton
-      {...props}
       label={props.donLabel}
     />
     <IconMenu 

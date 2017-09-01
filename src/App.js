@@ -10,17 +10,20 @@ import SwapVert from 'material-ui/svg-icons/action/swap-vert';
 import {Card, CardText, CardTitle} from 'material-ui/Card';
 import Subheader from 'material-ui/Subheader';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import Dialog from 'material-ui/Dialog';
 
 import debounce from 'lodash/debounce';
 import uniqBy from 'lodash/uniqBy'
+import uniq from 'lodash/uniq'
 
 import './App.css';
 import logo from './logo.svg';
-import { query, getTranslations, getMultTranslations } from './api';
+import { query, getTranslations, getMultTranslations, getTransPath } from './api';
 import UidChips from './UidChips';
 import UidInput from './UidInput';
 import PanLexAppBar from './PanLexAppBar';
 import TrnResult from './TrnResult';
+import ExprGraph from './ExprGraph';
 
 const compactWidth = 840
 injectTapEventPlugin();
@@ -56,6 +59,8 @@ class App extends Component {
       trnTxt: '',
       interfaceLangDialogOpen: false,
       translations: [],
+      pathExprs: [],
+      pathOpen: false,
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
     }
   }
@@ -140,6 +145,23 @@ class App extends Component {
       this.translate);
   }
 
+  handleTrnExprClick = (trnExprNum) => {
+    let trn = this.state.translations[trnExprNum]
+    getTransPath(trn.trans_expr, trn.id).then(expr => {
+      let pathExprs = uniq(Array.map(expr.trans_path.slice(0, 20), p => p[0].expr2));
+      let path = [expr.trans_expr, ...pathExprs, expr.id];
+      // this.setState({pathDe, pathAl, pathExprs, pathOpen: true});
+      query('/expr', {id: path, include: 'uid'}).then(response => {
+        let exprObj = response.result.reduce((obj, e) => {obj[e.id] = {txt: e.txt, uid: e.uid}; return(obj)}, {});
+        this.setState({pathExprs: path.map(e => exprObj[e]), pathOpen: true});
+      })
+    });
+  }
+
+  handlePathClose = () => {
+    this.setState({pathOpen: false})
+  }
+
   render() {
     this.state.muiTheme.isRtl = (this.state.direction === 'rtl');
     return (
@@ -160,6 +182,12 @@ class App extends Component {
               }}
               interfaceLangvar={this.state.interfaceLangvar}
             />
+            <Dialog 
+              open={this.state.pathOpen}
+              onRequestClose={this.handlePathClose}
+            >
+              <ExprGraph pathExprs={this.state.pathExprs}/>
+            </Dialog>
             <div className="trn">
               <div className="trn-box">
                 {/* <Subheader>
@@ -247,6 +275,7 @@ class App extends Component {
                     <TrnResult
                       direction={this.state.direction}
                       translations={this.state.translations}
+                      onExprClick={this.handleTrnExprClick}
                     />
                   </CardText>
                 </Card>

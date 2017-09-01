@@ -8,7 +8,9 @@ class TrnResult extends Component {
   render() {
     let maxBon = (this.props.translations.length) ? this.props.translations[0].trans_quality : 1;
     return (
-      <Table>
+      <Table
+        onCellClick={this.props.onExprClick}
+      >
         <TableBody displayRowCheckbox={false}>
           {this.props.translations.map( (trn, index) => {
             let bonWidth = (trn.trans_quality / maxBon) * 48;
