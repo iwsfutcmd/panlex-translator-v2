@@ -3,18 +3,18 @@ import React, { Component } from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import RaisedButton from 'material-ui/RaisedButton';
+import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 import CircularProgress from 'material-ui/CircularProgress';
 import SwapHoriz from 'material-ui/svg-icons/action/swap-horiz';
 import SwapVert from 'material-ui/svg-icons/action/swap-vert';
+import Close from 'material-ui/svg-icons/navigation/close';
 import {Card, CardText, CardTitle} from 'material-ui/Card';
-import Subheader from 'material-ui/Subheader';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import Dialog from 'material-ui/Dialog';
 
 import debounce from 'lodash/debounce';
 import uniqBy from 'lodash/uniqBy';
-import uniq from 'lodash/uniq';
 import shuffle from 'lodash/shuffle';
 import countBy from 'lodash/countBy';
 import orderBy from 'lodash/orderBy';
@@ -65,6 +65,7 @@ class App extends Component {
       compact: window.innerWidth <= compactWidth,
       muiTheme,
       loading: false,
+      exprGraphLoading: false,
       direction: 'ltr',
       langsDe: [],
       langsAl: [],
@@ -74,7 +75,7 @@ class App extends Component {
       interfaceLangDialogOpen: false,
       translations: [],
       pathExprs: DEBUG ? testPath : [],
-      pathOpen: DEBUG ? true : false,
+      exprGraphOpen: DEBUG ? true : false,
       pathDirect: DEBUG ? true: false,
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
     }
@@ -158,6 +159,7 @@ class App extends Component {
   }
 
   handleTrnExprClick = (trnExprNum) => {
+    this.setState({exprGraphLoading: true, exprGraphOpen: true});
     let trn = this.state.translations[trnExprNum]
     getTransPath(trn.trans_expr, trn.id).then(expr => {
       let path;
@@ -173,14 +175,14 @@ class App extends Component {
         let pathDirect = Boolean(response.result.length);
         query('/expr', {id: path, include: 'uid'}).then(response => {
           let exprObj = response.result.reduce((obj, e) => {obj[e.id] = {txt: e.txt, uid: e.uid}; return(obj)}, {});
-          this.setState({pathExprs: path.map(e => exprObj[e]), pathOpen: true, pathDirect});
+          this.setState({pathExprs: path.map(e => exprObj[e]), pathDirect, exprGraphLoading: false});
         })
       })
     });
   }
 
   handlePathClose = () => {
-    this.setState({pathOpen: false})
+    this.setState({exprGraphOpen: false})
   }
 
   render() {
@@ -204,19 +206,22 @@ class App extends Component {
               interfaceLangvar={this.state.interfaceLangvar}
             />
             <Dialog 
-              open={this.state.pathOpen}
+              open={this.state.exprGraphOpen}
               onRequestClose={this.handlePathClose}
-              contentStyle={{maxWidth: "none"}}
-              // autoDetectWindowHeight={false}
+              contentStyle={{maxWidth: "none", display: "flex", justifyContent: "center"}}
+              actions={
+                <IconButton onClick={this.handlePathClose}>
+                  <Close/>
+                </IconButton>
+              }
             >
-              {/* <div>beeeewp</div> */}
-              <ExprGraph pathExprs={this.state.pathExprs} pathDirect={this.state.pathDirect}/>
+              {this.state.exprGraphLoading ? 
+                <CircularProgress/> :
+                <ExprGraph pathExprs={this.state.pathExprs} pathDirect={this.state.pathDirect}/>
+              }
             </Dialog>
             <div className="trn">
               <div className="trn-box">
-                {/* <Subheader>
-                  {[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
-                </Subheader> */}
                 <div className="uid-box">
                   <div className="uid-box-button">
                     <UidInput
@@ -237,7 +242,6 @@ class App extends Component {
                   <UidChips
                     langList={this.state.langsDe}
                     onSelectLang={(langList) => this.setState({langsDe: langList}, () => {this.translate(); this.validateTxt()})}
-                    // onSelectLang={(lang) => this.setState({langDe: lang}, () => {this.translate(); this.validateTxt()})}
                   />
                 </div>
                 <Card className="trn-card">
@@ -257,9 +261,6 @@ class App extends Component {
                 </Card>
               </div>
               <div className="trn-box">
-                {/* <Subheader>
-                  {[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
-                </Subheader> */}
                 <div className="uid-box">
                   <div className="uid-box-button">
                     <UidInput
@@ -283,7 +284,6 @@ class App extends Component {
                   <UidChips
                     langList={this.state.langsAl}
                     onSelectLang={(langList) => this.setState({langsAl: langList}, this.translate)}
-                    // onSelectLang={(lang) => this.setState({langAl: lang}, this.translate)}
                   />
                 </div>
                 <Card className="trn-card">

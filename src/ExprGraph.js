@@ -40,7 +40,7 @@ export default class ExprGraph extends Component{
   
   options = {
     autoResize: true,
-    // height: window.innerHeight * 0.75,
+    width: "100%",
     layout: {
     },
     edges: {
@@ -52,7 +52,8 @@ export default class ExprGraph extends Component{
   };
   
   render() {
-    this.options.height = window.innerHeight * 0.70;
+    this.options.height = '' + window.innerHeight * 0.70;
+    this.options.width = '' + window.innerWidth * 0.85;
     return (
       <Graph 
         graph={this.prepGraph(this.props)}

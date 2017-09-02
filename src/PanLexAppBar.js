@@ -65,6 +65,7 @@ export default class PanLexAppBar extends Component{
         </AppBar>
         <Dialog
           open={this.state.interfaceLangDialogOpen}
+          onRequestClose={() => this.setState({interfaceLangDialogOpen: false})}
         >
           <UidInput
             onNewRequest={(lang) => {
