@@ -13,8 +13,11 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import Dialog from 'material-ui/Dialog';
 
 import debounce from 'lodash/debounce';
-import uniqBy from 'lodash/uniqBy'
-import uniq from 'lodash/uniq'
+import uniqBy from 'lodash/uniqBy';
+import uniq from 'lodash/uniq';
+import shuffle from 'lodash/shuffle';
+import countBy from 'lodash/countBy';
+import orderBy from 'lodash/orderBy';
 
 import './App.css';
 import logo from './logo.svg';
@@ -28,11 +31,22 @@ import ExprGraph from './ExprGraph';
 const compactWidth = 840
 injectTapEventPlugin();
 
-const DEBUG = true;
-const initialUids = ['eng-000', 'uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000']
+const DEBUG = false;
+const initialUids = ['uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000']
+
+const testPath = [
+  {txt: 'dog', uid: 'eng-000'},
+  {txt: 'chien', uid: 'fra-000'},
+  {txt: 'perro', uid: 'spa-000'},
+  {txt: 'hundur', uid: 'isl-000'},
+  {txt: 'hund', uid: 'dan-000'},
+  {txt: 'ancing', uid: 'ind-000'},
+  {txt: 'كلب', uid: 'arb-000'},
+  {txt: 'कुत्ता', uid: 'hin-000'},
+  {txt: 'श्वन्', uid: 'san-000'},
+];
 
 class App extends Component {
-
   constructor(props) {
     super(props);
     const muiTheme = getMuiTheme({
@@ -45,7 +59,7 @@ class App extends Component {
         accent3Color: "#1b1b1b",
       }
     })
-    let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod', 'npo', 'don']
+    let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod', 'npo', 'don', 'plu']
     
     this.state = {
       compact: window.innerWidth <= compactWidth,
@@ -59,8 +73,9 @@ class App extends Component {
       trnTxt: '',
       interfaceLangDialogOpen: false,
       translations: [],
-      pathExprs: [],
-      pathOpen: false,
+      pathExprs: DEBUG ? testPath : [],
+      pathOpen: DEBUG ? true : false,
+      pathDirect: DEBUG ? true: false,
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
     }
   }
@@ -83,12 +98,9 @@ class App extends Component {
     query('/langvar', {uid: initialUids}).then(
       (response) => {
         let uidNames = response.result.reduce((obj, lang) => {obj[lang.uid] = lang.name_expr_txt; return(obj)}, {})
-        let langsDe = [];
-        let langsAl = [];
-        for (let uid of initialUids) {
-          langsDe.push({uid, name: uidNames[uid]});
-          langsAl.push({uid, name: uidNames[uid]});
-        }
+        let langs = initialUids.map(uid => ({uid, name: uidNames[uid]}));
+        let langsDe = [{uid: 'eng-000', name: 'English'}].concat(shuffle(langs));
+        let langsAl = shuffle(langs).concat([{uid: 'eng-000', name: 'English'}]);
         this.setState({langsDe, langsAl});
     })
   }
@@ -148,12 +160,21 @@ class App extends Component {
   handleTrnExprClick = (trnExprNum) => {
     let trn = this.state.translations[trnExprNum]
     getTransPath(trn.trans_expr, trn.id).then(expr => {
-      let pathExprs = uniq(Array.map(expr.trans_path.slice(0, 20), p => p[0].expr2));
-      let path = [expr.trans_expr, ...pathExprs, expr.id];
-      // this.setState({pathDe, pathAl, pathExprs, pathOpen: true});
-      query('/expr', {id: path, include: 'uid'}).then(response => {
-        let exprObj = response.result.reduce((obj, e) => {obj[e.id] = {txt: e.txt, uid: e.uid}; return(obj)}, {});
-        this.setState({pathExprs: path.map(e => exprObj[e]), pathOpen: true});
+      let path;
+      if (expr) {
+        let pathExprCount = Object.entries(countBy(expr.trans_path.map(p => p[0].expr2)));
+        let sortedPathExprs = orderBy(pathExprCount, o => o[1], 'desc');
+        let pathExprs = sortedPathExprs.slice(0, 20).map(p => p[0]);
+        path = [expr.trans_expr, ...pathExprs, expr.id];
+      } else {
+        path = [trn.trans_expr, trn.id]
+      }
+      query('/expr', {trans_expr: path[0], id: path[path.length - 1]}).then(response => {
+        let pathDirect = Boolean(response.result.length);
+        query('/expr', {id: path, include: 'uid'}).then(response => {
+          let exprObj = response.result.reduce((obj, e) => {obj[e.id] = {txt: e.txt, uid: e.uid}; return(obj)}, {});
+          this.setState({pathExprs: path.map(e => exprObj[e]), pathOpen: true, pathDirect});
+        })
       })
     });
   }
@@ -185,8 +206,11 @@ class App extends Component {
             <Dialog 
               open={this.state.pathOpen}
               onRequestClose={this.handlePathClose}
+              contentStyle={{maxWidth: "none"}}
+              // autoDetectWindowHeight={false}
             >
-              <ExprGraph pathExprs={this.state.pathExprs}/>
+              {/* <div>beeeewp</div> */}
+              <ExprGraph pathExprs={this.state.pathExprs} pathDirect={this.state.pathDirect}/>
             </Dialog>
             <div className="trn">
               <div className="trn-box">
@@ -200,7 +224,7 @@ class App extends Component {
                         let selectedLang = {uid: item.uid, name: item.text};
                         this.setState({langsDe: uniqBy([selectedLang, ...this.state.langsDe], 'uid')}, () => {this.translate(); this.validateTxt()});
                       }}
-                      label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
+                      label={[this.getLabel('lng'), this.getLabel('plu')].join(' — ')}
                       interfaceLangvar={this.state.interfaceLangvar}
                       align="start"
                     />
@@ -243,7 +267,7 @@ class App extends Component {
                         let selectedLang = {uid: item.uid, name: item.text};
                         this.setState({langsAl: uniqBy([selectedLang, ...this.state.langsAl], 'uid')}, this.translate);
                       }}
-                      label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
+                      label={[this.getLabel('lng'), this.getLabel('plu')].join(' — ')}
                       interfaceLangvar={this.state.interfaceLangvar}
                       align="start"
                     />

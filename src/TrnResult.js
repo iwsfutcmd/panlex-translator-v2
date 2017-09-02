@@ -7,6 +7,7 @@ import './TrnResult.css';
 class TrnResult extends Component {
   render() {
     let maxBon = (this.props.translations.length) ? this.props.translations[0].trans_quality : 1;
+    let bonBarStyle = {transform: (this.props.direction === 'rtl') ? "scaleX(1)" : "scaleX(-1)"};
     return (
       <Table
         onCellClick={this.props.onExprClick}
@@ -21,7 +22,7 @@ class TrnResult extends Component {
               >
                 <TableRowColumn 
                   className="bon-bar-cell"
-                  style={{transform: (this.props.direction === 'rtl') ? "scaleX(1)" : "scaleX(-1)"}}
+                  style={bonBarStyle}
                 >
                   <svg className="bon-bar" width={48} height={16}>
                     <rect width={48} height={16} rx={4} ry={4} fill="rgb(189, 189, 189)"/>
@@ -30,7 +31,7 @@ class TrnResult extends Component {
 
                 </TableRowColumn>
                 <TableRowColumn
-                  style={{fontSize: '16px', height: '40px'}}
+                  className="trn-cell"
                 >
                   {trn.txt}
                 </TableRowColumn>

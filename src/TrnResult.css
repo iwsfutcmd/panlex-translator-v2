@@ -18,6 +18,10 @@
 .bon-bar {
   vertical-align: middle;
 }
+
+.trn-cell {
+  font-size: 16px !important;
+}
 /*.trn-row td div div {
   margin: unset !important;
 }*/
