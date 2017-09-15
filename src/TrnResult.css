@@ -15,6 +15,11 @@
   margin: 0 8px;
 }
 
+.graph-button-cell {
+  width: 36px;
+  padding: 2px !important;
+}
+
 .bon-bar {
   vertical-align: middle;
 }

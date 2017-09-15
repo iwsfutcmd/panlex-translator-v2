@@ -10,11 +10,15 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
 import UidInput from './UidInput';
 
+
+
 const Menu = (props) => (
   <div style={{display: 'flex', alignItems: 'center'}}>
-    <RaisedButton
-      label={props.donLabel}
-    />
+    <a href="https://new.panlex.org/donate">
+      <RaisedButton
+        label={props.donLabel}
+      />
+    </a>
     <IconMenu 
       {...props}
       iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}

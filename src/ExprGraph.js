@@ -17,8 +17,8 @@ export default class ExprGraph extends Component{
   prepGraph = (props) => {
     
     let exprNodes = props.pathExprs.map((expr, index) => ({id: index, label: this.labelIfSelected(expr, index)}))
-    exprNodes[0].mass = 20;
-    exprNodes[exprNodes.length - 1].mass = 20;
+    exprNodes[0].mass = exprNodes.length - 2;
+    exprNodes[exprNodes.length - 1].mass = exprNodes.length - 2;
     let exprEdges = []
     if (props.pathDirect) {
       exprEdges.push({from: 0, to: exprNodes.length - 1});
@@ -35,7 +35,7 @@ export default class ExprGraph extends Component{
       this.setState({
         nodeSelected: event.nodes[0],
       })
-    }
+    },
   };
   
   options = {
@@ -45,9 +45,15 @@ export default class ExprGraph extends Component{
     },
     edges: {
       smooth: true,
+      arrows: {
+        to: false,
+      }
     },
     physics: {
       stabilization: true,
+    },
+    interaction: {
+      hover: true,
     },
   };
   

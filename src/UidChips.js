@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Chip from 'material-ui/Chip';
 import muiThemeable from 'material-ui/styles/muiThemeable';
-import VisibilitySensor from 'react-visibility-sensor';
 
 import './UidChips.css';
 

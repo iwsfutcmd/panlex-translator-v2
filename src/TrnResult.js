@@ -1,16 +1,22 @@
 import React, { Component } from 'react';
 
 import { Table, TableBody, TableRow, TableRowColumn } from 'material-ui/Table';
+import RaisedButton from 'material-ui/RaisedButton';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import './TrnResult.css';
+import networkIcon from './network.svg';
 
 class TrnResult extends Component {
   render() {
     let maxBon = (this.props.translations.length) ? this.props.translations[0].trans_quality : 1;
-    let bonBarStyle = {transform: (this.props.direction === 'rtl') ? "scaleX(1)" : "scaleX(-1)"};
+    let bonBarStyle = {transform: (this.props.direction === 'rtl') ? "scaleX(-1)" : "scaleX(1)"};
     return (
       <Table
-        onCellClick={this.props.onExprClick}
+        onCellClick={(rowNumber, columnId) => {
+          if (columnId === 2) {
+            this.props.onExprClick(rowNumber)
+          }
+        }}
       >
         <TableBody displayRowCheckbox={false}>
           {this.props.translations.map( (trn, index) => {
@@ -34,6 +40,14 @@ class TrnResult extends Component {
                   className="trn-cell"
                 >
                   {trn.txt}
+                </TableRowColumn>
+                <TableRowColumn
+                  className="graph-button-cell"
+                >
+                  <RaisedButton 
+                    icon={<img src={networkIcon} width="24px" height="24px"/>}
+                    style={{minWidth: 'unset', width: "36px"}}
+                  />
                 </TableRowColumn>
               </TableRow>
             )})}
