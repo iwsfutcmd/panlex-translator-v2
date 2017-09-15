@@ -14,7 +14,7 @@ import UidInput from './UidInput';
 
 const Menu = (props) => (
   <div style={{display: 'flex', alignItems: 'center'}}>
-    <a href="https://new.panlex.org/donate">
+    <a href="https://panlex.org/donate">
       <RaisedButton
         label={props.donLabel}
       />
