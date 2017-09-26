@@ -10,7 +10,6 @@ import SwapHoriz from 'material-ui/svg-icons/action/swap-horiz';
 import SwapVert from 'material-ui/svg-icons/action/swap-vert';
 import Close from 'material-ui/svg-icons/navigation/close';
 import {Card, CardText, CardTitle} from 'material-ui/Card';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 import Dialog from 'material-ui/Dialog';
 
 import debounce from 'lodash/debounce';
@@ -29,7 +28,6 @@ import TrnResult from './TrnResult';
 import ExprGraph from './ExprGraph';
 
 const compactWidth = 840
-injectTapEventPlugin();
 
 const DEBUG = false;
 const initialUids = ['uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000']
