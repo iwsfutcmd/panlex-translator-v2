@@ -38,7 +38,7 @@ export default class ExprGraph extends Component{
     exprNodes[lastNodeIndex].shape = "ellipse";
     let exprEdges = []
     if (props.pathDirect) {
-      exprEdges.push({from: 0, to: lastNodeIndex, arrows: {to: {scaleFactor: .75}, from: {scaleFactor: .75}}});
+      exprEdges.push({from: 0, to: lastNodeIndex, arrows: {to: true, from: true}});
     }
     for (let node of exprNodes.slice(1, -1)) {
       exprEdges.push({from: 0, to: node.id})
@@ -59,12 +59,15 @@ export default class ExprGraph extends Component{
   options = {
     autoResize: true,
     width: "100%",
-    layout: {
-    },
     nodes: {
-      color: "#C82521",
+      borderWidth: 2,
+      color: {
+        border: "#C82521", background: "#ffc2a7", 
+        highlight: {border: "#C82521", background: "#ffc2a7"},
+        hover: {border: "#C82521", background: "#ffc2a7"},
+      },
       font: {
-        color: "white",
+        color: "black",
       }
     },
     edges: {
@@ -72,6 +75,7 @@ export default class ExprGraph extends Component{
       arrows: {
         to: false,
       },
+      color: {color: "black", highlight: "black", hover: "black", inherit: false},
     },
     physics: {
       stabilization: true,
