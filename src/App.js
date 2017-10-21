@@ -29,7 +29,7 @@ import ExprGraph from './ExprGraph';
 
 const compactWidth = 840
 
-const DEBUG = false;
+const DEBUG = true;
 const initialUids = ['uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000']
 
 const testPath = [
@@ -49,7 +49,8 @@ class App extends Component {
     super(props);
     const muiTheme = getMuiTheme({
       palette: {
-        primary1Color: "#A60A0A",
+        primary1Color: "#C82521",
+        // primary1Color: "#A60A0A",
         primary2Color: "#DF4A34",
         primary3Color: "#700000",
         accent1Color: "#424242",
@@ -62,6 +63,8 @@ class App extends Component {
     this.state = {
       compact: window.innerWidth <= compactWidth,
       muiTheme,
+      uidCache: {},
+      uidNames: {},
       loading: false,
       exprGraphLoading: false,
       direction: 'ltr',
@@ -76,6 +79,8 @@ class App extends Component {
       exprGraphOpen: DEBUG ? true : false,
       pathDirect: DEBUG ? true: false,
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
+      // langUnknown: true,
+      // foundLangs: [],
     }
   }
 
@@ -85,7 +90,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.getInitialLangs(initialUids);
+    this.cacheUidNames().then(() => {this.getInitialLangs(initialUids)});
     this.setLabels('eng-000');
   }
 
@@ -93,15 +98,38 @@ class App extends Component {
     window.removeEventListener('resize', () => this.setState({windowWidth: window.innerWidth}));
   }
 
+  cacheUids = () => (
+    query('/langvar', {limit: 0})
+      .then(r => {
+        let uidCache = {};
+        r.result.forEach(lv => {uidCache[lv.uid] = lv});
+        this.setState({uidCache});
+      })
+  )
+
+  cacheUidNames = () => (
+    query('/langvar', {limit: 0})
+      .then(r => {
+        let uidNames = {};
+        r.result.forEach(lv => {uidNames[lv.uid] = lv.name_expr_txt});
+        this.setState({uidNames});
+      })
+  )
+
   getInitialLangs = (initialUids) => {
-    query('/langvar', {uid: initialUids}).then(
-      (response) => {
-        let uidNames = response.result.reduce((obj, lang) => {obj[lang.uid] = lang.name_expr_txt; return(obj)}, {})
-        let langs = initialUids.map(uid => ({uid, name: uidNames[uid]}));
-        let langsDe = [{uid: 'eng-000', name: 'English'}].concat(shuffle(langs));
-        let langsAl = shuffle(langs).concat([{uid: 'eng-000', name: 'English'}]);
-        this.setState({langsDe, langsAl});
-    })
+    let langs = initialUids.map(uid => ({uid, name: this.state.uidNames[uid]}));
+    let langsDe = [{uid: 'eng-000', name: 'English'}].concat(shuffle(langs));
+    let langsAl = shuffle(langs).concat([{uid: 'eng-000', name: 'English'}]);
+    this.setState({langsDe, langsAl});
+    
+    // query('/langvar', {uid: initialUids}).then(
+    //   (response) => {
+    //     let uidNames = response.result.reduce((obj, lang) => {obj[lang.uid] = lang.name_expr_txt; return(obj)}, {})
+    //     let langs = initialUids.map(uid => ({uid, name: uidNames[uid]}));
+    //     let langsDe = [{uid: 'eng-000', name: 'English'}].concat(shuffle(langs));
+    //     let langsAl = shuffle(langs).concat([{uid: 'eng-000', name: 'English'}]);
+    //     this.setState({langsDe, langsAl});
+    // })
   }
 
   setLabels = (uid) => {
@@ -130,6 +158,13 @@ class App extends Component {
           this.setState({txtError: !response.result.length})
         })
     }
+    // if (this.state.txt.trim() && this.state.langUnknown) {
+    //   query('/expr', {txt: this.state.txt.trim(), include: 'uid'})
+    //     .then((response) => {
+    //       let foundLangs = response.result.map(r => ({uid: r.uid, name: r.uid}));
+    //       this.setState({foundLangs});
+    //     })
+    // }
   }, 200)
 
   translate = (event) => {
@@ -215,7 +250,7 @@ class App extends Component {
             >
               {this.state.exprGraphLoading ? 
                 <CircularProgress/> :
-                <ExprGraph pathExprs={this.state.pathExprs} pathDirect={this.state.pathDirect}/>
+                <ExprGraph pathExprs={this.state.pathExprs} pathDirect={this.state.pathDirect} uidNames={this.state.uidNames}/>
               }
             </Dialog>
             <div className="trn">
@@ -257,6 +292,9 @@ class App extends Component {
                     </form>
                   </CardText>
                 </Card>
+                {/* <UidChips
+                  langList={this.state.foundLangs}
+                /> */}
               </div>
               <div className="trn-box">
                 <div className="uid-box">

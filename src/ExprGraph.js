@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import Graph from 'react-graph-vis';
+import 'vis/dist/vis-network.min.css';
 
 export default class ExprGraph extends Component{
   constructor(props) {
@@ -10,22 +11,38 @@ export default class ExprGraph extends Component{
     }
   }
   
-  labelIfSelected = (expr, index) => (
-    index === this.state.nodeSelected ? expr.txt + '\n' + expr.uid : expr.txt
+  labelIfSelected = (expr, selected) => (
+    selected ? `<b>${expr.txt}</b>\n<i>${this.props.uidNames[expr.uid] || expr.uid}</i>` : expr.txt
   )
   
   prepGraph = (props) => {
     
-    let exprNodes = props.pathExprs.map((expr, index) => ({id: index, label: this.labelIfSelected(expr, index)}))
+    let exprNodes = props.pathExprs.map((expr, index) => ({
+      id: index,
+      label: this.labelIfSelected(expr, index === this.state.nodeSelected),
+      shape: "box",
+      font: {
+        multi: true,
+        ital: {size: 12, vadjust: 2},
+      },
+      title: props.uidNames[expr.uid],
+    }))
+    let lastNodeIndex = exprNodes.length - 1;
     exprNodes[0].mass = exprNodes.length - 2;
-    exprNodes[exprNodes.length - 1].mass = exprNodes.length - 2;
+    exprNodes[0].font.size = 24;
+    exprNodes[0].font.ital.size = 16;
+    exprNodes[0].shape = "ellipse";
+    exprNodes[lastNodeIndex].mass = exprNodes.length - 2;
+    exprNodes[lastNodeIndex].font.size = 24;
+    exprNodes[lastNodeIndex].font.ital.size = 16;
+    exprNodes[lastNodeIndex].shape = "ellipse";
     let exprEdges = []
     if (props.pathDirect) {
-      exprEdges.push({from: 0, to: exprNodes.length - 1});
+      exprEdges.push({from: 0, to: lastNodeIndex, arrows: {to: {scaleFactor: .75}, from: {scaleFactor: .75}}});
     }
     for (let node of exprNodes.slice(1, -1)) {
       exprEdges.push({from: 0, to: node.id})
-      exprEdges.push({from: node.id, to: exprNodes.length - 1})
+      exprEdges.push({from: node.id, to: lastNodeIndex})
     }
     return({nodes: exprNodes, edges: exprEdges})
   };
@@ -36,6 +53,7 @@ export default class ExprGraph extends Component{
         nodeSelected: event.nodes[0],
       })
     },
+    hoverNode: event => console.log(event),
   };
   
   options = {
@@ -43,11 +61,17 @@ export default class ExprGraph extends Component{
     width: "100%",
     layout: {
     },
+    nodes: {
+      color: "#C82521",
+      font: {
+        color: "white",
+      }
+    },
     edges: {
       smooth: true,
       arrows: {
         to: false,
-      }
+      },
     },
     physics: {
       stabilization: true,
