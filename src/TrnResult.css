@@ -1,28 +1,37 @@
 .trn-row {
-  height: 40px !important;
+  block-size: 40px !important;
   /*display: flex;*/
   /*align-items: center;*/
 }
 
 .trn-row td {
   text-align: start !important;
-  height: 40px !important;
+  block-size: 40px !important;
 }
 
 .bon-bar-cell {
-  width: 48px;
+  inline-size: 48px;
   padding: unset !important;
-  margin: 0 8px;
 }
 
 .graph-button-cell {
-  width: 36px;
+  inline-size: 36px;
   padding: 2px !important;
+  padding-inline-end: 24px !important;
+}
+
+.bon-bar-background {
+  inline-size: 48px;
+  block-size: 16px;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .bon-bar {
-  vertical-align: middle;
+  block-size: 100%;
+  border-radius: inherit;
 }
+
 
 .trn-cell {
   font-size: 16px !important;

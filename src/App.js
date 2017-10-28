@@ -32,25 +32,12 @@ const compactWidth = 840
 const DEBUG = false;
 const initialUids = ['uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000']
 
-const testPath = [
-  {txt: 'dog', uid: 'eng-000'},
-  {txt: 'chien', uid: 'fra-000'},
-  {txt: 'perro', uid: 'spa-000'},
-  {txt: 'hundur', uid: 'isl-000'},
-  {txt: 'hund', uid: 'dan-000'},
-  {txt: 'ancing', uid: 'ind-000'},
-  {txt: 'كلب', uid: 'arb-000'},
-  {txt: 'कुत्ता', uid: 'hin-000'},
-  {txt: 'श्वन्', uid: 'san-000'},
-];
-
 class App extends Component {
   constructor(props) {
     super(props);
     const muiTheme = getMuiTheme({
       palette: {
         primary1Color: "#C82521",
-        // primary1Color: "#A60A0A",
         primary2Color: "#DF4A34",
         primary3Color: "#700000",
         accent1Color: "#424242",
@@ -58,7 +45,7 @@ class App extends Component {
         accent3Color: "#1b1b1b",
       }
     })
-    let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod', 'npo', 'don', 'plu']
+    let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod', 'npo', 'don', 'plu', 'trn', 'viz']
     
     this.state = {
       compact: window.innerWidth <= compactWidth,
@@ -70,14 +57,15 @@ class App extends Component {
       direction: 'ltr',
       langsDe: [],
       langsAl: [],
-      txt: '',
+      txt: DEBUG ? "house" : '',
       txtError: false,
       trnTxt: '',
+      trnTrn: 0,
       interfaceLangDialogOpen: false,
       translations: [],
-      pathExprs: DEBUG ? testPath : [],
-      exprGraphOpen: DEBUG ? true : false,
-      pathDirect: DEBUG ? true: false,
+      pathExprs: [],
+      exprGraphOpen: false,
+      pathDirect: false,
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
       // langUnknown: true,
       // foundLangs: [],
@@ -90,7 +78,11 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.cacheUidNames().then(() => {this.getInitialLangs(initialUids)});
+    this.cacheUidNames().then(
+      () => this.getInitialLangs(initialUids)).then(
+        () => {if (DEBUG) {
+          this.translate().then(() => this.handleTrnExprClick(0))
+        }});
     this.setLabels('eng-000');
   }
 
@@ -173,7 +165,7 @@ class App extends Component {
     } catch (e) {}
     this.setState({loading: true});
     if (this.state.txt.trim() && this.state.langsDe.length && this.state.langsAl.length) {
-      getTranslations(this.state.txt.trim(), this.state.langsDe[0].uid, this.state.langsAl[0].uid)
+      return getTranslations(this.state.txt.trim(), this.state.langsDe[0].uid, this.state.langsAl[0].uid, this.state.trnTrn)
         .then((result) => {
           let trnTxt = result.length ? result[0].txt : '';
           this.setState({trnTxt, translations: result, loading: false});
@@ -237,6 +229,11 @@ class App extends Component {
                 this.setLabels(lang.uid);
               }}
               interfaceLangvar={this.state.interfaceLangvar}
+              trnLabel={this.getLabel('trn')}
+              trnTrnLabel={[this.getLabel('trn'), this.getLabel('trn')].join(' — ')}
+              handleTrnTrn={() => this.setState({trnTrn: (this.state.trnTrn + 1) % 3})}
+              trnTrn={this.state.trnTrn}
+              debug={DEBUG}
             />
             <Dialog 
               open={this.state.exprGraphOpen}
@@ -333,9 +330,10 @@ class App extends Component {
                   </CardTitle>
                   <CardText expandable={true}>
                     <TrnResult
-                      direction={this.state.direction}
+                      // direction={this.state.direction}
                       translations={this.state.translations}
                       onExprClick={this.handleTrnExprClick}
+                      graphButtonAlt={[this.getLabel('trn'), this.getLabel('viz')].join(' — ')}
                     />
                   </CardText>
                 </Card>

@@ -4,19 +4,25 @@
 
 .trn {
   display: flex;
-  padding: 0px 20px;
+  /*padding: logical 0px 20px;*/
+  padding-inline-start: 20px;
+  padding-inline-end: 20px;
   flex-direction: row;
 }
 
 .trn-box {
   flex: auto;
-  padding: 0px 8px;
+  /*padding: logical 0px 8px;*/
+  padding-inline-start: 8px;
+  padding-inline-end: 8px;
   box-sizing: border-box;
-  width: 50%;
+  inline-size: 50%;
 }
 
 .trn-card {
-  margin: 4px 0px;
+  /*margin: logical 4px 0px;*/
+  margin-block-start: 4px;
+  margin-block-end: 4px;
 }
 
 .uid-box {
@@ -31,17 +37,19 @@
   align-items: baseline;
   justify-content: space-between;
   /*margin-inline-start: 4px;*/
-  width: 100%
+  inline-size: 100%
 }
 
 @media (max-width: 840px) {
   .trn {
     flex-direction: column;
-    padding: 0px 12px;
+    /*padding: logical 0px 12px;*/
+    padding-inline-start: 12px;
+    padding-inline-end: 12px;
   }
   
   .trn-box {
-    width: 100%;
+    inline-size: 100%;
   }
   /*
   .uid-box {
@@ -54,7 +62,7 @@
 }
 
 .result {
-  margin-top: 16px;
+  margin-block-start: 16px;
 }
 
 .trn-title {

@@ -28,17 +28,23 @@ export default class ExprGraph extends Component{
       title: props.uidNames[expr.uid],
     }))
     let lastNodeIndex = exprNodes.length - 1;
-    exprNodes[0].mass = exprNodes.length - 2;
-    exprNodes[0].font.size = 24;
-    exprNodes[0].font.ital.size = 16;
-    exprNodes[0].shape = "ellipse";
-    exprNodes[lastNodeIndex].mass = exprNodes.length - 2;
-    exprNodes[lastNodeIndex].font.size = 24;
-    exprNodes[lastNodeIndex].font.ital.size = 16;
-    exprNodes[lastNodeIndex].shape = "ellipse";
+    for (let node of [exprNodes[0], exprNodes[lastNodeIndex]]) {
+      node.mass = exprNodes.length - 2;
+      node.font.size = 16;
+      node.font.ital.size = 14;
+      node.shape = "ellipse";
+    }
+    // exprNodes[0].mass = exprNodes.length - 2;
+    // exprNodes[0].font.size = 24;
+    // exprNodes[0].font.ital.size = 16;
+    // exprNodes[0].shape = "ellipse";
+    // exprNodes[lastNodeIndex].mass = exprNodes.length - 2;
+    // exprNodes[lastNodeIndex].font.size = 24;
+    // exprNodes[lastNodeIndex].font.ital.size = 16;
+    // exprNodes[lastNodeIndex].shape = "ellipse";
     let exprEdges = []
     if (props.pathDirect) {
-      exprEdges.push({from: 0, to: lastNodeIndex, arrows: {to: true, from: true}});
+      exprEdges.push({width: 2, from: 0, to: lastNodeIndex, arrows: {to: true, from: true}});
     }
     for (let node of exprNodes.slice(1, -1)) {
       exprEdges.push({from: 0, to: node.id})
@@ -61,11 +67,11 @@ export default class ExprGraph extends Component{
     width: "100%",
     nodes: {
       borderWidth: 2,
-      color: {
-        border: "#C82521", background: "#ffc2a7", 
-        highlight: {border: "#C82521", background: "#ffc2a7"},
-        hover: {border: "#C82521", background: "#ffc2a7"},
-      },
+      // color: {
+      //   border: "#C82521", background: "#ffc2a7", 
+      //   highlight: {border: "#C82521", background: "#ffc2a7"},
+      //   hover: {border: "#C82521", background: "#ffc2a7"},
+      // },
       font: {
         color: "black",
       }
