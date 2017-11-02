@@ -10,10 +10,10 @@ import SwapHoriz from 'material-ui/svg-icons/action/swap-horiz';
 import SwapVert from 'material-ui/svg-icons/action/swap-vert';
 import Close from 'material-ui/svg-icons/navigation/close';
 import {Card, CardText, CardTitle} from 'material-ui/Card';
+import Chip from 'material-ui/Chip';
 import Dialog from 'material-ui/Dialog';
 
 import debounce from 'lodash/debounce';
-import uniqBy from 'lodash/uniqBy';
 import shuffle from 'lodash/shuffle';
 import countBy from 'lodash/countBy';
 import orderBy from 'lodash/orderBy';
@@ -21,7 +21,7 @@ import orderBy from 'lodash/orderBy';
 import './App.css';
 import logo from './logo.svg';
 import { query, getTranslations, getMultTranslations, getTransPath } from './api';
-import UidChips from './UidChips';
+import LvChips from './LvChips';
 import UidInput from './UidInput';
 import PanLexAppBar from './PanLexAppBar';
 import TrnResult from './TrnResult';
@@ -54,8 +54,9 @@ class App extends Component {
       loading: false,
       exprGraphLoading: false,
       direction: 'ltr',
-      langsDe: [],
-      langsAl: [],
+      langDe: {},
+      langAl: {},
+      langs: [],
       txt: DEBUG ? "house" : '',
       txtError: false,
       trnTxt: '',
@@ -91,9 +92,21 @@ class App extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.interfaceLangvar !== this.state.interfaceLangvar) {
       this.setLabels();
-      let langs = this.state.langsDe.concat(this.state.langsAl);
-      this.getOtherNames(langs.map(lang => lang.id));
+      this.getOtherNames(this.state.langs.map(lang => lang.id));
     }
+    if (prevState.langDe.id && (prevState.langDe.id !== this.state.langDe.id)) {
+      this.setState(
+        {langs: [...new Set([prevState.langDe, ...prevState.langs])]},
+        () => {this.translate(); this.validateTxt()}
+      )
+    }
+    if (prevState.langAl.id && (prevState.langAl.id !== this.state.langAl.id)) {
+      this.setState(
+        {langs: [...new Set([prevState.langDe, ...prevState.langs])]},
+        () => {this.translate()}
+      )
+    }
+    if (prevState.txt !== this.state.txt) {this.validateTxt()}
   }
 
   cacheLvs = () => (
@@ -117,10 +130,13 @@ class App extends Component {
         interfaceLv = lv;
       }
     })
-    let langsDe = [interfaceLv].concat(shuffle(langs));
-    let langsAl = shuffle(langs).concat([interfaceLv]);
-    this.setState({langsDe, langsAl, interfaceLangvar: interfaceLv.id});
-    this.getOtherNames(langsDe.map(lang => lang.id), interfaceLv.id)
+    this.setState({
+      langDe: interfaceLv,
+      langAl: shuffle(langs)[0],
+      langs: shuffle(langs),
+      interfaceLangvar: interfaceLv.id
+    });
+    this.getOtherNames(langs.map(lang => lang.id), interfaceLv.id)
   }
 
   setLabels = () => {
@@ -157,10 +173,10 @@ class App extends Component {
   }
 
   validateTxt = debounce(() => {
-    if (this.state.txt.trim() && this.state.langsDe.length) {
-      query('/expr', {uid: this.state.langsDe[0].uid, txt: this.state.txt.trim()})
+    if (this.state.txt.trim() && this.state.langDe.id) {
+      query('/expr/count', {langvar: this.state.langDe.id, txt: this.state.txt.trim()})
         .then((response) => {
-          this.setState({txtError: !response.result.length})
+          this.setState({txtError: !response.count})
         })
     }
     // if (this.state.txt.trim() && this.state.langUnknown) {
@@ -172,13 +188,13 @@ class App extends Component {
     // }
   }, 200)
 
-  translate = (event) => {
+  translate = event => {
     try {
       event.preventDefault();
     } catch (e) {}
     this.setState({loading: true});
-    if (this.state.txt.trim() && this.state.langsDe.length && this.state.langsAl.length) {
-      return getTranslations(this.state.txt.trim(), this.state.langsDe[0].uid, this.state.langsAl[0].uid, this.state.trnTrn)
+    if (this.state.txt.trim() && this.state.langDe.id && this.state.langAl.id) {
+      return getTranslations(this.state.txt.trim(), this.state.langDe.id, this.state.langAl.id, this.state.trnTrn)
         .then((result) => {
           let trnTxt = result.length ? result[0].txt : '';
           this.setState({trnTxt, translations: result, loading: false});
@@ -190,8 +206,8 @@ class App extends Component {
 
   swapLng = (event) => {
     this.setState(prevState => ({
-      langsDe: prevState.langsAl,
-      langsAl: prevState.langsDe,
+      langDe: prevState.langAl,
+      langAl: prevState.langDe,
       txt: prevState.trnTxt}),
       this.translate);
   }
@@ -222,6 +238,13 @@ class App extends Component {
   handlePathClose = () => {
     this.setState({exprGraphOpen: false})
   }
+
+  drop = event => {
+    event.preventDefault();
+    let data = parseInt(event.dataTransfer.getData("text"), 10);
+    console.log(event, data);
+  }
+
 
   render() {
     this.state.muiTheme.isRtl = (this.state.direction === 'rtl');
@@ -268,8 +291,8 @@ class App extends Component {
                   <div className="uid-box-button">
                     <UidInput
                       onNewRequest={(item) => {
-                        let selectedLang = this.state.lvCache.get(item.id);
-                        this.setState({langsDe: uniqBy([selectedLang, ...this.state.langsDe], 'uid')}, () => {this.translate(); this.validateTxt()});
+                        let langDe = this.state.lvCache.get(item.id);
+                        this.setState({langDe});
                       }}
                       label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
                       interfaceLangvar={this.state.interfaceLangvar}
@@ -281,10 +304,17 @@ class App extends Component {
                       onClick={this.swapLng}
                     />
                   </div>
-                  <UidChips
-                    langList={this.state.langsDe}
-                    onSelectLang={(langList) => this.setState({langsDe: langList}, () => {this.translate(); this.validateTxt()})}
-                  />
+                  <Chip
+                    className="lng-chip droppable"
+                    onDrop={event => {
+                      event.preventDefault();
+                      let langDe = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
+                      this.setState({langDe})
+                    }}
+                    onDragOver={event => {event.preventDefault()}}
+                  >
+                    {this.state.langDe.name_expr_txt}
+                  </Chip>
                 </div>
                 <Card className="trn-card">
                   <CardText>
@@ -292,26 +322,24 @@ class App extends Component {
                       <TextField
                         hintText={this.getLabel('txt')}
                         fullWidth={true}
-                        onChange={(event, txt) => {
-                          this.setState({txt}, this.validateTxt);
-                        }}
+                        onChange={(event, txt) => {this.setState({txt})}}
                         value={this.state.txt}
                         errorText={this.state.txtError ? this.getLabel('npo') : ""}
                       />
                     </form>
                   </CardText>
                 </Card>
-                {/* <UidChips
-                  langList={this.state.foundLangs}
-                /> */}
+                <LvChips
+                  langList={this.state.langs}
+                />
               </div>
               <div className="trn-box">
                 <div className="uid-box">
                   <div className="uid-box-button">
                     <UidInput
                       onNewRequest={(item) => {
-                        let selectedLang = this.state.lvCache.get(item.id);
-                        this.setState({langsAl: uniqBy([selectedLang, ...this.state.langsAl], 'uid')}, this.translate);
+                        let langAl = this.state.lvCache.get(item.id);
+                        this.setState({langAl});
                       }}
                       label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
                       interfaceLangvar={this.state.interfaceLangvar}
@@ -326,10 +354,17 @@ class App extends Component {
                       form="trn-txt"
                     />
                   </div>
-                  <UidChips
-                    langList={this.state.langsAl}
-                    onSelectLang={(langList) => this.setState({langsAl: langList}, this.translate)}
-                  />
+                  <Chip
+                    className="lng-chip droppable"
+                    onDrop={event => {
+                      event.preventDefault();
+                      let langAl = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
+                      this.setState({langAl})
+                    }}
+                    onDragOver={event => {event.preventDefault()}}
+                  >
+                    {this.state.langAl.name_expr_txt}
+                  </Chip>
                 </div>
                 <Card className="trn-card">
                   <CardTitle

@@ -10,7 +10,13 @@ class UidChips extends Component {
     let selectedLang = langList.splice(index, 1)[0];
     this.props.onSelectLang([selectedLang, ...langList]);
   }
-    
+  
+  drag = event => {
+    event.dataTransfer.setData("text", event.target.dataset.lv);
+    // document.getElementById("lng-name").classList.add("drop-highlight");
+  }
+
+  
   render() {
     return (
       <span className="chips" ref="chips">
@@ -19,6 +25,8 @@ class UidChips extends Component {
             className="lng-chip"
             backgroundColor={this.props.muiTheme.palette.accent1Color}
             labelColor={this.props.muiTheme.palette.alternateTextColor}
+            draggable={true}
+            onDragStart={this.drag}
           >
             {this.props.langList[0].name_expr_txt}
             {/* <div className="lng-chip-names">
@@ -34,6 +42,9 @@ class UidChips extends Component {
               key={index+1}
               className="lng-chip"
               onClick={(event) => this.selectPrevLang(event, index+1)}
+              draggable={true}
+              onDragStart={this.drag}
+              data-lv={lang.id}
             >
               {lang.name_expr_txt}
             </Chip>
