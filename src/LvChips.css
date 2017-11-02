@@ -1,0 +1,35 @@
+.chips {
+  display: flex;
+  /*overflow: hidden;*/
+  flex-wrap: wrap;
+  /*flex-direction: row;*/
+  inline-size: 100%;
+}
+
+.lng-chip {
+  /*height: 100%;*/
+  margin: 4px !important;
+}
+
+.lng-chip-names {
+  visibility: hidden;
+  position: absolute;
+  background-color: black;
+  color: white;
+  border-radius: 16px;
+  z-index: 1;
+  top: 100%;
+  left: 0;
+}
+
+.lng-chip:hover .lng-chip-names {
+  visibility: visible;
+}
+
+.drop-highlight {
+  background-color: black !important;
+}
+
+.drop-highlight span {
+  color: white !important;
+}
