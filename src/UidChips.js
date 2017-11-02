@@ -20,7 +20,12 @@ class UidChips extends Component {
             backgroundColor={this.props.muiTheme.palette.accent1Color}
             labelColor={this.props.muiTheme.palette.alternateTextColor}
           >
-            {this.props.langList[0].name}
+            {this.props.langList[0].name_expr_txt}
+            {/* <div className="lng-chip-names">
+              Mushroomese
+              <br/>
+              Mooshroomic
+            </div> */}
           </Chip>
         }
         {(this.props.langList.length > 1) &&
@@ -30,7 +35,7 @@ class UidChips extends Component {
               className="lng-chip"
               onClick={(event) => this.selectPrevLang(event, index+1)}
             >
-              {lang.name}
+              {lang.name_expr_txt}
             </Chip>
           ))
         }

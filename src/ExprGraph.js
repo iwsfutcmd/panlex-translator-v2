@@ -12,11 +12,10 @@ export default class ExprGraph extends Component{
   }
   
   labelIfSelected = (expr, selected) => (
-    selected ? `<b>${expr.txt}</b>\n<i>${this.props.uidNames[expr.uid] || expr.uid}</i>` : expr.txt
+    selected ? `<b>${expr.txt}</b>\n<i>${this.props.lvCache.get(expr.langvar).name_expr_txt || expr.uid}</i>` : expr.txt
   )
   
   prepGraph = (props) => {
-    
     let exprNodes = props.pathExprs.map((expr, index) => ({
       id: index,
       label: this.labelIfSelected(expr, index === this.state.nodeSelected),
@@ -25,7 +24,7 @@ export default class ExprGraph extends Component{
         multi: true,
         ital: {size: 12, vadjust: 2},
       },
-      title: props.uidNames[expr.uid],
+      title: props.lvCache.get(expr.langvar).name_expr_txt,
     }))
     let lastNodeIndex = exprNodes.length - 1;
     for (let node of [exprNodes[0], exprNodes[lastNodeIndex]]) {
@@ -59,7 +58,6 @@ export default class ExprGraph extends Component{
         nodeSelected: event.nodes[0],
       })
     },
-    hoverNode: event => console.log(event),
   };
   
   options = {

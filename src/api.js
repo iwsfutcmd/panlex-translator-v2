@@ -16,12 +16,20 @@ function query(ep, params) {
 
 function getTranslations(txt, uidDe, uidAl, distance = 0) {
   let queryOne = {
-    trans_uid: uidDe,
-    uid: uidAl,
     trans_txt: txt,
     include: ['trans_quality', 'trans_txt', 'trans_langvar'],
     sort: 'trans_quality desc',
   };
+  if (typeof uidDe === 'number') {
+    queryOne.trans_langvar = uidDe
+  } else {
+    queryOne.trans_uid = uidDe
+  }
+  if (typeof uidAl === 'number') {
+    queryOne.langvar = uidAl
+  } else {
+    queryOne.uid = uidAl
+  }
   let queryTwo = Object.assign({trans_distance: 2}, queryOne);
   switch (distance) {
     case 1:

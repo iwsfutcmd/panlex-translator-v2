@@ -28,7 +28,7 @@ export default class UidInput extends Component {
           let suggestions = response.suggest.map((s) => {
             let altNameString = s.trans.slice(1).map(tran => tran.txt).join(' — ');
             return {
-              uid: s.uid, 
+              id: s.id, 
               value: (
                 <MenuItem>
                   <div className='uid-item' style={{direction: this.props.direction}}>

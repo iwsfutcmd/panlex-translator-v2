@@ -97,7 +97,7 @@ export default class PanLexAppBar extends Component{
           <UidInput
             onNewRequest={(lang) => {
               this.setState({interfaceLangDialogOpen: false});
-              this.props.setInterfaceLang(lang);
+              this.props.setInterfaceLangvar(lang.id);
             }}
             direction={this.state.direction}
             label={this.props.lngModLabel}

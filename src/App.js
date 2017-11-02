@@ -30,8 +30,8 @@ import ExprGraph from './ExprGraph';
 const compactWidth = 840
 
 const DEBUG = false;
-const initialUids = ['uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000']
-
+const initialUids = ['uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000'];
+const initialInterfaceUid = "eng-000";
 class App extends Component {
   constructor(props) {
     super(props);
@@ -50,8 +50,7 @@ class App extends Component {
     this.state = {
       compact: window.innerWidth <= compactWidth,
       muiTheme,
-      uidCache: {},
-      uidNames: {},
+      lvCache: new Map(),
       loading: false,
       exprGraphLoading: false,
       direction: 'ltr',
@@ -67,8 +66,6 @@ class App extends Component {
       exprGraphOpen: false,
       pathDirect: false,
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
-      // langUnknown: true,
-      // foundLangs: [],
     }
   }
 
@@ -78,70 +75,86 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.cacheUidNames().then(
+    // this.cacheLvs();
+    this.cacheLvs().then(
       () => this.getInitialLangs(initialUids)).then(
         () => {if (DEBUG) {
           this.translate().then(() => this.handleTrnExprClick(0))
-        }});
-    this.setLabels('eng-000');
+        }
+      });
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', () => this.setState({windowWidth: window.innerWidth}));
   }
 
-  cacheUids = () => (
-    query('/langvar', {limit: 0})
-      .then(r => {
-        let uidCache = {};
-        r.result.forEach(lv => {uidCache[lv.uid] = lv});
-        this.setState({uidCache});
-      })
-  )
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.interfaceLangvar !== this.state.interfaceLangvar) {
+      this.setLabels();
+      let langs = this.state.langsDe.concat(this.state.langsAl);
+      this.getOtherNames(langs.map(lang => lang.id));
+    }
+  }
 
-  cacheUidNames = () => (
+  cacheLvs = () => (
     query('/langvar', {limit: 0})
       .then(r => {
-        let uidNames = {};
-        r.result.forEach(lv => {uidNames[lv.uid] = lv.name_expr_txt});
-        this.setState({uidNames});
+        let lvCache = new Map();
+        r.result.forEach(lv => {lvCache.set(lv.id, lv)});
+        this.setState({lvCache});
       })
   )
 
   getInitialLangs = (initialUids) => {
-    let langs = initialUids.map(uid => ({uid, name: this.state.uidNames[uid]}));
-    let langsDe = [{uid: 'eng-000', name: 'English'}].concat(shuffle(langs));
-    let langsAl = shuffle(langs).concat([{uid: 'eng-000', name: 'English'}]);
-    this.setState({langsDe, langsAl});
-    
-    // query('/langvar', {uid: initialUids}).then(
-    //   (response) => {
-    //     let uidNames = response.result.reduce((obj, lang) => {obj[lang.uid] = lang.name_expr_txt; return(obj)}, {})
-    //     let langs = initialUids.map(uid => ({uid, name: uidNames[uid]}));
-    //     let langsDe = [{uid: 'eng-000', name: 'English'}].concat(shuffle(langs));
-    //     let langsAl = shuffle(langs).concat([{uid: 'eng-000', name: 'English'}]);
-    //     this.setState({langsDe, langsAl});
-    // })
+    let initialUidsSet = new Set(initialUids);
+    let langs = [];
+    let interfaceLv;
+    this.state.lvCache.forEach((lv, lvId) => {
+      if (initialUidsSet.has(lv.uid)) {
+        langs.push(lv);
+      }
+      if (lv.uid === initialInterfaceUid) {
+        interfaceLv = lv;
+      }
+    })
+    let langsDe = [interfaceLv].concat(shuffle(langs));
+    let langsAl = shuffle(langs).concat([interfaceLv]);
+    this.setState({langsDe, langsAl, interfaceLangvar: interfaceLv.id});
+    this.getOtherNames(langsDe.map(lang => lang.id), interfaceLv.id)
   }
 
-  setLabels = (uid) => {
-    getMultTranslations(Object.keys(this.state.labels), 'art-000', uid).then(
+  setLabels = () => {
+    getMultTranslations(Object.keys(this.state.labels), 'art-000', this.state.interfaceLangvar).then(
       result => {
-        let interfaceLangvar
+        // let interfaceLangvar
         let labels = Object.keys(this.state.labels).reduce((obj, label) => {
           if (result[label][0]) {
             obj[label] = result[label][0].txt;
-            interfaceLangvar = result[label][0].langvar;
+            // interfaceLangvar = result[label][0].langvar;
           }
           return(obj)
         }, {})
-        this.setState({labels, interfaceLangvar})
+        this.setState({labels})
       }
         
     )
   }
 
   getLabel = (label) => (this.state.labels[label]) ? this.state.labels[label] : label;
+
+  getOtherNames = (langvars) => {
+    getMultTranslations(langvars.map(lv => this.state.lvCache.get(lv).uid), 'art-274', this.state.interfaceLangvar)
+      .then(result => {
+        let lvCache = this.state.lvCache;
+        langvars.forEach(lv => {
+          let lang = lvCache.get(lv);
+          lang.otherNames = result[lang.uid].map(r => r.txt);
+          lvCache.set(lv, lang);
+
+        })
+        this.setState(lvCache);
+      })
+  }
 
   validateTxt = debounce(() => {
     if (this.state.txt.trim() && this.state.langsDe.length) {
@@ -199,7 +212,7 @@ class App extends Component {
       query('/expr', {trans_expr: path[0], id: path[path.length - 1]}).then(response => {
         let pathDirect = Boolean(response.result.length);
         query('/expr', {id: path, include: 'uid'}).then(response => {
-          let exprObj = response.result.reduce((obj, e) => {obj[e.id] = {txt: e.txt, uid: e.uid}; return(obj)}, {});
+          let exprObj = response.result.reduce((obj, e) => {obj[e.id] = {txt: e.txt, uid: e.uid, langvar: e.langvar}; return(obj)}, {});
           this.setState({pathExprs: path.map(e => exprObj[e]), pathDirect, exprGraphLoading: false});
         })
       })
@@ -222,11 +235,10 @@ class App extends Component {
               lngModLabel={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
               donLabel={this.getLabel('don')}
               switchDirection={() => this.setState({direction: (this.state.direction === 'rtl') ? 'ltr' : 'rtl'})}
-              setInterfaceLang={(lang) => {
+              setInterfaceLangvar={langvar => {
                 this.setState({ 
-                  interfaceLang: lang.uid,
+                  interfaceLangvar: langvar,
                 });
-                this.setLabels(lang.uid);
               }}
               interfaceLangvar={this.state.interfaceLangvar}
               trnLabel={this.getLabel('trn')}
@@ -247,7 +259,7 @@ class App extends Component {
             >
               {this.state.exprGraphLoading ? 
                 <CircularProgress/> :
-                <ExprGraph pathExprs={this.state.pathExprs} pathDirect={this.state.pathDirect} uidNames={this.state.uidNames}/>
+                <ExprGraph pathExprs={this.state.pathExprs} pathDirect={this.state.pathDirect} lvCache={this.state.lvCache}/>
               }
             </Dialog>
             <div className="trn">
@@ -256,10 +268,10 @@ class App extends Component {
                   <div className="uid-box-button">
                     <UidInput
                       onNewRequest={(item) => {
-                        let selectedLang = {uid: item.uid, name: item.text};
+                        let selectedLang = this.state.lvCache.get(item.id);
                         this.setState({langsDe: uniqBy([selectedLang, ...this.state.langsDe], 'uid')}, () => {this.translate(); this.validateTxt()});
                       }}
-                      label={[this.getLabel('lng'), this.getLabel('plu')].join(' — ')}
+                      label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
                       interfaceLangvar={this.state.interfaceLangvar}
                       align="start"
                     />
@@ -298,10 +310,10 @@ class App extends Component {
                   <div className="uid-box-button">
                     <UidInput
                       onNewRequest={(item) => {
-                        let selectedLang = {uid: item.uid, name: item.text};
+                        let selectedLang = this.state.lvCache.get(item.id);
                         this.setState({langsAl: uniqBy([selectedLang, ...this.state.langsAl], 'uid')}, this.translate);
                       }}
-                      label={[this.getLabel('lng'), this.getLabel('plu')].join(' — ')}
+                      label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
                       interfaceLangvar={this.state.interfaceLangvar}
                       align="start"
                     />
@@ -330,7 +342,6 @@ class App extends Component {
                   </CardTitle>
                   <CardText expandable={true}>
                     <TrnResult
-                      // direction={this.state.direction}
                       translations={this.state.translations}
                       onExprClick={this.handleTrnExprClick}
                       graphButtonAlt={[this.getLabel('trn'), this.getLabel('viz')].join(' — ')}

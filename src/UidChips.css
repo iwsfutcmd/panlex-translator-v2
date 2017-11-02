@@ -10,3 +10,18 @@
   /*height: 100%;*/
   margin: 4px !important;
 }
+
+.lng-chip-names {
+  visibility: hidden;
+  position: absolute;
+  background-color: black;
+  color: white;
+  border-radius: 16px;
+  z-index: 1;
+  top: 100%;
+  left: 0;
+}
+
+.lng-chip:hover .lng-chip-names {
+  visibility: visible;
+}
