@@ -1,0 +1,20 @@
+.lng-info {
+  display: flex;
+  align-items: center;
+}
+
+.lng-nom {
+  display: flex;
+}
+
+.lng-nom-label {
+  font-size: small;
+  font-style: oblique;
+  margin-inline-end: 2px;
+}
+
+.lng-nom-plu {
+  font-size: small;
+  margin-inline-start: 2px;
+  margin-inline-end: 2px;
+}

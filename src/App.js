@@ -10,7 +10,6 @@ import SwapHoriz from 'material-ui/svg-icons/action/swap-horiz';
 import SwapVert from 'material-ui/svg-icons/action/swap-vert';
 import Close from 'material-ui/svg-icons/navigation/close';
 import {Card, CardText, CardTitle} from 'material-ui/Card';
-import Chip from 'material-ui/Chip';
 import Dialog from 'material-ui/Dialog';
 
 import debounce from 'lodash/debounce';
@@ -21,6 +20,7 @@ import orderBy from 'lodash/orderBy';
 import './App.css';
 import logo from './logo.svg';
 import { query, getTranslations, getMultTranslations, getTransPath } from './api';
+import LngInfo from './LngInfo';
 import LvChips from './LvChips';
 import UidInput from './UidInput';
 import PanLexAppBar from './PanLexAppBar';
@@ -45,7 +45,7 @@ class App extends Component {
         accent3Color: "#1b1b1b",
       }
     })
-    let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod', 'npo', 'don', 'plu', 'trn', 'viz']
+    let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod', 'npo', 'don', 'plu', 'trn', 'viz', 'nom']
     
     this.state = {
       compact: window.innerWidth <= compactWidth,
@@ -92,18 +92,18 @@ class App extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.interfaceLangvar !== this.state.interfaceLangvar) {
       this.setLabels();
-      this.getOtherNames(this.state.langs.map(lang => lang.id));
+      this.getOtherNames();
     }
     if (prevState.langDe.id && (prevState.langDe.id !== this.state.langDe.id)) {
       this.setState(
         {langs: [...new Set([prevState.langDe, ...prevState.langs])]},
-        () => {this.translate(); this.validateTxt()}
+        () => {this.translate(); this.validateTxt(); this.getOtherNames()}
       )
     }
     if (prevState.langAl.id && (prevState.langAl.id !== this.state.langAl.id)) {
       this.setState(
         {langs: [...new Set([prevState.langDe, ...prevState.langs])]},
-        () => {this.translate()}
+        () => {this.translate(); this.getOtherNames()}
       )
     }
     if (prevState.txt !== this.state.txt) {this.validateTxt()}
@@ -117,6 +117,8 @@ class App extends Component {
         this.setState({lvCache});
       })
   )
+
+  fromLvCache = (lvId) => (this.state.lvCache.get(lvId) || {})
 
   getInitialLangs = (initialUids) => {
     let initialUidsSet = new Set(initialUids);
@@ -136,7 +138,7 @@ class App extends Component {
       langs: shuffle(langs),
       interfaceLangvar: interfaceLv.id
     });
-    this.getOtherNames(langs.map(lang => lang.id), interfaceLv.id)
+    // this.getOtherNames(langs.map(lang => lang.id), interfaceLv.id)
   }
 
   setLabels = () => {
@@ -158,12 +160,13 @@ class App extends Component {
 
   getLabel = (label) => (this.state.labels[label]) ? this.state.labels[label] : label;
 
-  getOtherNames = (langvars) => {
-    getMultTranslations(langvars.map(lv => this.state.lvCache.get(lv).uid), 'art-274', this.state.interfaceLangvar)
+  getOtherNames = () => {
+    let langs = [this.state.langDe, this.state.langAl, ...this.state.langs]
+    getMultTranslations(langs.map(lv => lv.uid), 'art-274', this.state.interfaceLangvar)
       .then(result => {
         let lvCache = this.state.lvCache;
-        langvars.forEach(lv => {
-          let lang = lvCache.get(lv);
+        langs.forEach(lv => {
+          let lang = lvCache.get(lv.id);
           lang.otherNames = result[lang.uid].map(r => r.txt);
           lvCache.set(lv, lang);
 
@@ -286,7 +289,15 @@ class App extends Component {
               }
             </Dialog>
             <div className="trn">
-              <div className="trn-box">
+              <div 
+                className="trn-box"
+                onDrop={event => {
+                  event.preventDefault();
+                  let langDe = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
+                  this.setState({langDe})
+                }}
+                onDragOver={event => {event.preventDefault()}}
+              >
                 <div className="uid-box">
                   <div className="uid-box-button">
                     <UidInput
@@ -304,17 +315,10 @@ class App extends Component {
                       onClick={this.swapLng}
                     />
                   </div>
-                  <Chip
-                    className="lng-chip droppable"
-                    onDrop={event => {
-                      event.preventDefault();
-                      let langDe = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
-                      this.setState({langDe})
-                    }}
-                    onDragOver={event => {event.preventDefault()}}
-                  >
-                    {this.state.langDe.name_expr_txt}
-                  </Chip>
+                  <LngInfo 
+                    label={this.getLabel('nom') + " — " + this.fromLvCache(this.state.interfaceLangvar).name_expr_txt + ":"}
+                    lang={this.state.langDe}
+                  />
                 </div>
                 <Card className="trn-card">
                   <CardText>
@@ -333,7 +337,16 @@ class App extends Component {
                   langList={this.state.langs}
                 />
               </div>
-              <div className="trn-box">
+              <div
+                className="trn-box"
+                onDrop={event => {
+                  event.preventDefault();
+                  let langAl = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
+                  this.setState({langAl})
+                }}
+                onDragOver={event => {event.preventDefault()}}
+
+              >
                 <div className="uid-box">
                   <div className="uid-box-button">
                     <UidInput
@@ -354,17 +367,10 @@ class App extends Component {
                       form="trn-txt"
                     />
                   </div>
-                  <Chip
-                    className="lng-chip droppable"
-                    onDrop={event => {
-                      event.preventDefault();
-                      let langAl = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
-                      this.setState({langAl})
-                    }}
-                    onDragOver={event => {event.preventDefault()}}
-                  >
-                    {this.state.langAl.name_expr_txt}
-                  </Chip>
+                  <LngInfo 
+                    label={this.getLabel('nom') + " — " + this.fromLvCache(this.state.interfaceLangvar).name_expr_txt + ":"}
+                    lang={this.state.langAl}
+                  />
                 </div>
                 <Card className="trn-card">
                   <CardTitle

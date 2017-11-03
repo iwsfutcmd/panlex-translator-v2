@@ -27,9 +27,9 @@
 }
 
 .drop-highlight {
-  background-color: black !important;
+  border: 2px dashed black !important;
 }
 
 .drop-highlight span {
-  color: white !important;
+  /*color: white !important;*/
 }
