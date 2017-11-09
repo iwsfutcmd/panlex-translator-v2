@@ -29,7 +29,7 @@ import ExprGraph from './ExprGraph';
 
 const compactWidth = 840
 
-const DEBUG = true;
+const DEBUG = false;
 const initialUids = ['uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000'];
 const initialInterfaceUid = "eng-000";
 class App extends Component {
