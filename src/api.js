@@ -16,14 +16,19 @@ function query(ep, params) {
 
 function getTranslations(txt, uidDe, uidAl, distance = 0) {
   let queryOne = {
-    trans_txt: txt,
     include: ['trans_quality', 'trans_txt', 'trans_langvar'],
     sort: 'trans_quality desc',
   };
-  if (typeof uidDe === 'number') {
-    queryOne.trans_langvar = uidDe
+  // if (typeof txt === 'number' || txt.every(v => typeof v === 'number')) {
+  if (Array.prototype.every.call(txt, v => typeof v === 'number')) {
+    queryOne.trans_expr = txt
   } else {
-    queryOne.trans_uid = uidDe
+    queryOne.trans_txt = txt
+    if (typeof uidDe === 'number') {
+      queryOne.trans_langvar = uidDe
+    } else {
+      queryOne.trans_uid = uidDe
+    }
   }
   if (typeof uidAl === 'number') {
     queryOne.langvar = uidAl
@@ -61,7 +66,7 @@ function getMultTranslations(txtArray, uidDe, uidAl) {
         let output = {};
         let txtNotFound = [];
         for (let txt of txtArray) {
-          let trnList = result.filter(trn => (trn.trans_txt === txt));
+          let trnList = result.filter(trn => (trn.trans_txt === txt || trn.trans_expr === txt));
           if (trnList.length) {
             output[txt] = trnList;
           } else {
@@ -77,7 +82,7 @@ function getMultTranslations(txtArray, uidDe, uidAl) {
             getTranslations(txtNotFound, uidDe, uidAl).then(
               (result) => {
                 for (let txt of txtNotFound) {
-                  output[txt] = result.filter(trn => (trn.trans_txt === txt));
+                  output[txt] = result.filter(trn => (trn.trans_txt === txt || trn.trans_expr === txt));
                 }
                 return(output);
               }
@@ -91,4 +96,16 @@ function getMultTranslations(txtArray, uidDe, uidAl) {
   )
 }
 
-export { query, getTranslations, getTransPath, getMultTranslations }
+function getAllTranslations(uidDe, uidAl, byId = false) {
+  return(
+    query("/expr", typeof uidDe === 'number' ? {langvar: uidDe} : {uid: uidDe}).then(
+      r => {
+        let exprList = r.result.map(expr => byId ? expr.id : expr.txt);
+        return(
+          getMultTranslations(exprList, uidDe, uidAl)
+        )
+      }
+    )
+  )
+}
+export { query, getTranslations, getTransPath, getMultTranslations, getAllTranslations }

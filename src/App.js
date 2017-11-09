@@ -19,7 +19,7 @@ import orderBy from 'lodash/orderBy';
 
 import './App.css';
 import logo from './logo.svg';
-import { query, getTranslations, getMultTranslations, getTransPath } from './api';
+import { query, getTranslations, getMultTranslations, getTransPath, getAllTranslations } from './api';
 import LngInfo from './LngInfo';
 import LvChips from './LvChips';
 import UidInput from './UidInput';
@@ -29,7 +29,7 @@ import ExprGraph from './ExprGraph';
 
 const compactWidth = 840
 
-const DEBUG = false;
+const DEBUG = true;
 const initialUids = ['uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000'];
 const initialInterfaceUid = "eng-000";
 class App extends Component {
@@ -45,7 +45,10 @@ class App extends Component {
         accent3Color: "#1b1b1b",
       }
     })
-    let labelsToTranslate = ['PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod', 'npo', 'don', 'plu', 'trn', 'viz', 'nom']
+    let labelsToTranslate = [
+      'PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod', 'npo', 'don', 'plu',
+      'trn', 'viz', 'nom', 'kar', 'loc',
+    ]
     
     this.state = {
       compact: window.innerWidth <= compactWidth,
@@ -93,6 +96,8 @@ class App extends Component {
     if (prevState.interfaceLangvar !== this.state.interfaceLangvar) {
       this.setLabels();
       this.getOtherNames();
+      this.cacheKar();
+      this.cacheLoc();
     }
     if (prevState.langDe.id && (prevState.langDe.id !== this.state.langDe.id)) {
       this.setState(
@@ -110,13 +115,39 @@ class App extends Component {
   }
 
   cacheLvs = () => (
-    query('/langvar', {limit: 0})
-      .then(r => {
+    query('/langvar', {limit: 0}).then(
+      r => {
         let lvCache = new Map();
         r.result.forEach(lv => {lvCache.set(lv.id, lv)});
         this.setState({lvCache});
       })
   )
+  
+  cacheKar = () => (
+    getAllTranslations('art-262', this.state.interfaceLangvar, true).then(
+      karCache => {
+        let lvCache = this.state.lvCache;
+        lvCache.forEach(lv => {
+          lv.scriptNames = karCache[lv.script_expr].map(r => r.txt);
+        })
+        this.setState({lvCache});
+      }
+    )
+  )
+
+  cacheLoc = () => {
+    let locExprs = [];
+    this.state.lvCache.forEach(v => locExprs.push(v.region_expr));
+    getMultTranslations(locExprs, '', this.state.interfaceLangvar).then(
+      locCache => {
+        let lvCache = this.state.lvCache;
+        lvCache.forEach(lv => {
+          lv.regionNames = locCache[lv.region_expr].map(r => r.txt);
+        })
+        this.setState({lvCache});
+      }
+    )
+  }
 
   fromLvCache = (lvId) => (this.state.lvCache.get(lvId) || {})
 
@@ -148,13 +179,11 @@ class App extends Component {
         let labels = Object.keys(this.state.labels).reduce((obj, label) => {
           if (result[label][0]) {
             obj[label] = result[label][0].txt;
-            // interfaceLangvar = result[label][0].langvar;
           }
           return(obj)
         }, {})
         this.setState({labels})
       }
-        
     )
   }
 
@@ -242,12 +271,33 @@ class App extends Component {
     this.setState({exprGraphOpen: false})
   }
 
-  drop = event => {
-    event.preventDefault();
-    let data = parseInt(event.dataTransfer.getData("text"), 10);
-    console.log(event, data);
+  handleTouchLvChip = (event, lv) => {
+    [].forEach.call(document.getElementsByClassName("droppable"), e => {
+      e.classList.add("drop-highlight");
+    });
+    this.setState({touchedLv: lv});
   }
 
+  handleTouchLangDe = event => {
+    console.log(event);
+    [].forEach.call(document.getElementsByClassName("droppable"), e => {
+      e.classList.remove("drop-highlight");
+    });
+    let langDe = this.state.lvCache.get(this.state.touchedLv);
+    this.setState({langDe, touchedLv: undefined});
+  }
+
+  handleTouchLangAl = event => {
+    [].forEach.call(document.getElementsByClassName("droppable"), e => {
+      e.classList.remove("drop-highlight");
+    });
+    let langAl = this.state.lvCache.get(this.state.touchedLv);
+    this.setState({langAl, touchedLv: undefined});
+  }
+
+  clearTxt = () => {
+    this.setState({txt: ''});
+  }
 
   render() {
     this.state.muiTheme.isRtl = (this.state.direction === 'rtl');
@@ -289,52 +339,65 @@ class App extends Component {
               }
             </Dialog>
             <div className="trn">
-              <div 
-                className="trn-box"
-                onDrop={event => {
-                  event.preventDefault();
-                  let langDe = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
-                  this.setState({langDe})
-                }}
-                onDragOver={event => {event.preventDefault()}}
-              >
-                <div className="uid-box">
-                  <div className="uid-box-button">
-                    <UidInput
-                      onNewRequest={(item) => {
-                        let langDe = this.state.lvCache.get(item.id);
-                        this.setState({langDe});
-                      }}
-                      label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
-                      interfaceLangvar={this.state.interfaceLangvar}
-                      align="start"
-                    />
-                    <RaisedButton
-                      icon={this.state.compact ? <SwapVert/> : <SwapHoriz/>}
-                      style={{minWidth: 36}}
-                      onClick={this.swapLng}
+              <div className="trn-box">
+                <div
+                  onDrop={event => {
+                    event.preventDefault();
+                    let langDe = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
+                    if (langDe) {this.setState({langDe})}
+                  }}
+                  onDragOver={event => {event.preventDefault()}}
+                >
+                  <div className="uid-box">
+                    <div className="uid-box-button">
+                      <UidInput
+                        onNewRequest={(item) => {
+                          let langDe = this.state.lvCache.get(item.id);
+                          this.setState({langDe});
+                        }}
+                        label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
+                        interfaceLangvar={this.state.interfaceLangvar}
+                        align="start"
+                      />
+                      <RaisedButton
+                        icon={this.state.compact ? <SwapVert/> : <SwapHoriz/>}
+                        style={{minWidth: 36}}
+                        onClick={this.swapLng}
+                      />
+                    </div>
+                    <LngInfo 
+                      nomLabel={this.getLabel('nom') + " — " + this.fromLvCache(this.state.interfaceLangvar).name_expr_txt + ":"}
+                      karLabel={this.getLabel('kar') + ":"}
+                      locLabel={this.getLabel('loc') + ":"}
+                      lang={this.state.langDe}
+                      onTouchStart={this.state.touchedLv && this.handleTouchLangDe}
                     />
                   </div>
-                  <LngInfo 
-                    label={this.getLabel('nom') + " — " + this.fromLvCache(this.state.interfaceLangvar).name_expr_txt + ":"}
-                    lang={this.state.langDe}
-                  />
+                  <Card className="trn-card">
+                    <CardText>
+                      <div className="txt-input">
+                        <form id="trn-txt">
+                          <TextField
+                            hintText={this.getLabel('txt')}
+                            fullWidth={true}
+                            onChange={(event, txt) => {this.setState({txt})}}
+                            value={this.state.txt}
+                            errorText={this.state.txtError ? this.getLabel('npo') : ""}
+                          />
+                        </form>
+                        <button 
+                          className="clear-button"
+                          onClick={event => {event.preventDefault(); this.setState({txt: ''})}}
+                        >
+                          <Close/>
+                        </button>
+                      </div>
+                    </CardText>
+                  </Card>
                 </div>
-                <Card className="trn-card">
-                  <CardText>
-                    <form id="trn-txt">
-                      <TextField
-                        hintText={this.getLabel('txt')}
-                        fullWidth={true}
-                        onChange={(event, txt) => {this.setState({txt})}}
-                        value={this.state.txt}
-                        errorText={this.state.txtError ? this.getLabel('npo') : ""}
-                      />
-                    </form>
-                  </CardText>
-                </Card>
                 <LvChips
                   langList={this.state.langs}
+                  onTouchStart={this.handleTouchLvChip}
                 />
               </div>
               <div
@@ -342,7 +405,7 @@ class App extends Component {
                 onDrop={event => {
                   event.preventDefault();
                   let langAl = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
-                  this.setState({langAl})
+                  if (langAl) {this.setState({langAl})}
                 }}
                 onDragOver={event => {event.preventDefault()}}
 
@@ -368,13 +431,16 @@ class App extends Component {
                     />
                   </div>
                   <LngInfo 
-                    label={this.getLabel('nom') + " — " + this.fromLvCache(this.state.interfaceLangvar).name_expr_txt + ":"}
+                    nomLabel={this.getLabel('nom') + " — " + this.fromLvCache(this.state.interfaceLangvar).name_expr_txt + ":"}
+                    karLabel={this.getLabel('kar') + ":"}
+                    locLabel={this.getLabel('loc') + ":"}
                     lang={this.state.langAl}
+                    onTouchStart={this.state.touchedLv && this.handleTouchLangAl}
                   />
                 </div>
                 <Card className="trn-card">
                   <CardTitle
-                    className="trn-title"
+                    className="card-title"
                     title={this.state.trnTxt}
                     actAsExpander={true}
                     showExpandableButton={Boolean(this.state.trnTxt)}

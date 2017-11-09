@@ -27,11 +27,11 @@ class LvChips extends Component {
           this.props.langList.map((lang, index) => (
             <Chip
               key={index}
-              className="lng-chip"
-              // onClick={(event) => this.selectPrevLang(event, index+1)}
+              className="lng-chip draggable"
               draggable={true}
               onDragStart={this.drag}
               onDragEnd={this.dragStop}
+              onTouchStart={event => this.props.onTouchStart(event, lang.id)}
               data-lv={lang.id}
             >
               {lang.name_expr_txt}

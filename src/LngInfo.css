@@ -1,20 +1,31 @@
-.lng-info {
+.lng-info-box {
   display: flex;
   align-items: center;
+  inline-size: 100%;
 }
 
-.lng-nom {
-  display: flex;
+.lng-info {
+  margin-inline-start: 8px;
+  inline-size: 100%;
 }
 
-.lng-nom-label {
+.lng-info-line {
+  /*display: flex;*/
   font-size: small;
+}
+
+.lng-info-label {
   font-style: oblique;
   margin-inline-end: 2px;
 }
 
-.lng-nom-plu {
-  font-size: small;
+.lng-info-data {
   margin-inline-start: 2px;
   margin-inline-end: 2px;
+}
+
+@media (max-width: 840px) {
+  .lng-info-line {
+    flex-direction: column;
+  }
 }

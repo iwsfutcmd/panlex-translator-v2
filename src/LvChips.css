@@ -7,8 +7,11 @@
 }
 
 .lng-chip {
-  /*height: 100%;*/
   margin: 4px !important;
+}
+
+.draggable {
+  cursor: grab !important;
 }
 
 .lng-chip-names {

@@ -65,33 +65,27 @@
   margin-block-start: 16px;
 }
 
-.trn-title {
+.card-title {
   display: flex;
   justify-content: space-between;
 }
 
-.trn-title button {
+.card-title button {
   margin: unset !important;
   position: unset !important;
 }
 
-.lng-info {
+.txt-input {
   display: flex;
   align-items: center;
 }
 
-.lng-nom {
-  display: flex;
+#trn-txt {
+  inline-size: 100%;
 }
 
-.lng-nom-label {
-  font-size: small;
-  font-style: oblique;
-  margin-inline-end: 2px;
-}
-
-.lng-nom-plu {
-  font-size: small;
-  margin-inline-start: 2px;
-  margin-inline-end: 2px;
+.clear-button {
+  all: initial;
+  margin-inline-start: -24px;
+  z-index: 1;
 }
