@@ -1,16 +1,9 @@
 import React, { Component } from 'react';
-import Chip from 'material-ui/Chip';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 
 import './LvChips.css';
 
-class LvChips extends Component {
-  // selectPrevLang = (event, index) => {
-  //   let langList = this.props.langList.slice();
-  //   let selectedLang = langList.splice(index, 1)[0];
-  //   this.props.onSelectLang([selectedLang, ...langList]);
-  // }
-  
+export default class LvChips extends Component {
+
   drag = event => {
     event.dataTransfer.setData("text", event.target.dataset.lv);
     [].forEach.call(document.getElementsByClassName("droppable"), e => e.classList.add("drop-highlight"));
@@ -22,25 +15,23 @@ class LvChips extends Component {
   
   render() {
     return (
-      <span className="chips" ref="chips">
+      <span className="chip-list">
         {(this.props.langList.length > 0) &&
           this.props.langList.map((lang, index) => (
-            <Chip
+            <div
               key={index}
-              className="lng-chip draggable"
+              className="chip draggable"
               draggable={true}
               onDragStart={this.drag}
               onDragEnd={this.dragStop}
               onTouchStart={event => this.props.onTouchStart(event, lang.id)}
               data-lv={lang.id}
             >
-              {lang.name_expr_txt}
-            </Chip>
+              <span className="chip-label">{lang.name_expr_txt}</span>
+            </div>
           ))
         }
       </span>
     )
   }
 }
-
-export default muiThemeable()(LvChips);

@@ -12,6 +12,9 @@ import Close from 'material-ui/svg-icons/navigation/close';
 import {Card, CardText, CardTitle} from 'material-ui/Card';
 import Dialog from 'material-ui/Dialog';
 
+// import 'material-components-web/dist/material-components-web.css';
+// import { Button, Textfield } from 'rmwc';
+
 import debounce from 'lodash/debounce';
 import shuffle from 'lodash/shuffle';
 import countBy from 'lodash/countBy';
@@ -26,10 +29,12 @@ import UidInput from './UidInput';
 import PanLexAppBar from './PanLexAppBar';
 import TrnResult from './TrnResult';
 import ExprGraph from './ExprGraph';
+import './material.css';
 
 const compactWidth = 840
 
 const DEBUG = false;
+
 const initialUids = ['uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000'];
 const initialInterfaceUid = "eng-000";
 class App extends Component {
@@ -47,7 +52,7 @@ class App extends Component {
     })
     let labelsToTranslate = [
       'PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod', 'npo', 'don', 'plu',
-      'trn', 'viz', 'nom', 'kar', 'loc',
+      'trn', 'viz', 'nom', 'kar', 'loc', 'del',
     ]
     
     this.state = {
@@ -107,7 +112,7 @@ class App extends Component {
     }
     if (prevState.langAl.id && (prevState.langAl.id !== this.state.langAl.id)) {
       this.setState(
-        {langs: [...new Set([prevState.langDe, ...prevState.langs])]},
+        {langs: [...new Set([prevState.langAl, ...prevState.langs])]},
         () => {this.translate(); this.getOtherNames()}
       )
     }
@@ -384,12 +389,17 @@ class App extends Component {
                             value={this.state.txt}
                             errorText={this.state.txtError ? this.getLabel('npo') : ""}
                           />
+                          {/* <Textfield
+                            label={this.getLabel('txt')}
+                            fullwidth
+                          /> */}
                         </form>
                         <button 
                           className="clear-button"
                           onClick={event => {event.preventDefault(); this.setState({txt: ''})}}
                         >
-                          <Close/>
+                          {/* <Close/> */}
+                          <img src={require("./ic_close_black_24px.svg")} alt={this.getLabel('del')}/>
                         </button>
                       </div>
                     </CardText>
@@ -408,7 +418,6 @@ class App extends Component {
                   if (langAl) {this.setState({langAl})}
                 }}
                 onDragOver={event => {event.preventDefault()}}
-
               >
                 <div className="uid-box">
                   <div className="uid-box-button">
@@ -429,6 +438,15 @@ class App extends Component {
                       onClick={this.translate}
                       form="trn-txt"
                     />
+                    {/* <Button 
+                      onClick={this.translate}
+                      type="submit"
+                      raised
+                      form="trn-txt"
+                      ripple
+                      >
+                      {this.getLabel('tra')}
+                    </Button> */}
                   </div>
                   <LngInfo 
                     nomLabel={this.getLabel('nom') + " — " + this.fromLvCache(this.state.interfaceLangvar).name_expr_txt + ":"}

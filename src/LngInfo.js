@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Chip from 'material-ui/Chip';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 
 import './LngInfo.css';
@@ -8,12 +7,12 @@ class LngInfo extends Component {
   render() {
     return (
       <div className="lng-info-box">
-        <Chip
-          className="lng-chip droppable"
+        <div
+          className="chip droppable"
           onTouchStart={this.props.onTouchStart}
         >
-          {this.props.lang.name_expr_txt}
-        </Chip>
+          <span className="chip-label">{this.props.lang.name_expr_txt}</span>
+        </div>
         <details className="lng-info">
           <summary>
             <span className="lng-info-line">

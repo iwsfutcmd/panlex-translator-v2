@@ -1,0 +1,31 @@
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.chip-list > .chip {
+  margin-inline-start: 6px;
+  margin-inline-end: 6px;
+  margin-block-start: 4px;
+  margin-block-end: 4px;
+}
+
+.chip {
+  block-size: 32px;
+  border-radius: 16px;
+  background-color: rgb(224, 224, 224);
+  inline-size: fit-content;
+  inline-size: -moz-fit-content;
+  display: flex;
+  box-sizing: border-box;
+}
+
+.chip-label {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 13px;
+  font-family: "Roboto", sans-serif;
+  padding-inline-start: 12px;
+  padding-inline-end: 12px;
+  align-self: center;
+  white-space: nowrap;
+}

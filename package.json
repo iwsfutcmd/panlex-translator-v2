@@ -8,6 +8,7 @@
     "react-dom": "16.0.0",
     "react-graph-vis": "^1.0.1",
     "react-scripts": "^1.0.13",
+    "rmwc": "^0.0.1-beta10",
     "shebang-loader": "^0.0.1"
   },
   "scripts": {
