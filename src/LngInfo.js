@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 
 import './LngInfo.css';
 
-class LngInfo extends Component {
+export default class LngInfo extends Component {
   render() {
     return (
       <div className="lng-info-box">
         <div
-          className="chip droppable"
+          className="chip mdc-elevation--z1 droppable"
           onTouchStart={this.props.onTouchStart}
         >
           <span className="chip-label">{this.props.lang.name_expr_txt}</span>
@@ -47,5 +46,3 @@ class LngInfo extends Component {
     )
   }
 }
-
-export default muiThemeable()(LngInfo);

@@ -1,61 +1,13 @@
 import React, { Component } from 'react';
 
-import AppBar from 'material-ui/AppBar';
-import RaisedButton from 'material-ui/RaisedButton';
-import IconMenu from 'material-ui/IconMenu';
-import MenuItem from 'material-ui/MenuItem';
-import Dialog from 'material-ui/Dialog';
-import IconButton from 'material-ui/IconButton';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import 'material-components-web/dist/material-components-web.css';
+import * as mdc from 'material-components-web/dist/material-components-web.js';
 
 // import trnIcon from './trn.svg';
 // import trnTrnIcon from './trn-trn.svg';
 
+import './PanLexAppBar.css';
 import UidInput from './UidInput';
-
-
-
-const Menu = (props) => (
-  <div style={{display: 'flex', alignItems: 'center'}}>
-    <a href="https://panlex.org/donate">
-      <RaisedButton
-        label={props.donLabel}
-      />
-    </a>
-    <IconMenu 
-      {...props}
-      iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
-      anchorOrigin={{horizontal: props.originHorizontal, vertical: 'top'}}
-      targetOrigin={{horizontal: props.originHorizontal, vertical: 'top'}}
-    >
-      {props.debug &&
-        <MenuItem
-          primaryText="🔁"
-          onClick={props.switchDirection}
-        />
-      }
-      <MenuItem
-        primaryText={props.lngModLabel}
-        onClick={props.handleLngMod}
-      />
-      <MenuItem
-        primaryText={(() => {
-          switch(props.trnTrn) {
-            case 1:
-              return props.trnLabel;
-            case 2:
-              return props.trnTrnLabel;
-            default:
-              return "";
-          }
-        })()}
-        onClick={props.handleTrnTrn}
-      />
-    </IconMenu>
-  </div>
-)
-
-Menu.muiName = "IconMenu"
 
 export default class PanLexAppBar extends Component{
   constructor(props) {
@@ -65,45 +17,80 @@ export default class PanLexAppBar extends Component{
     }
   }
   
+  componentDidMount() {
+    this.interfaceLangDialog = new mdc.dialog.MDCDialog(document.querySelector('#interface-lang-dialog'));
+    this.moreMenu = new mdc.menu.MDCSimpleMenu(document.querySelector('#more-menu'));
+  }
+
   render () {
-    let originHorizontal = (this.props.direction === 'rtl') ? "left" : "right";
     return (
       <div>
-        <AppBar
-          title={this.props.title}
-          iconElementRight={
-            <Menu 
-              originHorizontal={originHorizontal}
-              switchDirection={this.props.switchDirection}
-              lngModLabel={this.props.lngModLabel}
-              donLabel={this.props.donLabel}
-              trnLabel={this.props.trnLabel}
-              trnTrnLabel={this.props.trnTrnLabel}
-              handleTrnTrn={this.props.handleTrnTrn}
-              trnTrn={this.props.trnTrn}
-              handleLngMod={() => this.setState({interfaceLangDialogOpen: true})}
-              debug={this.props.debug}
-            />
-          }
-          iconStyleRight={{margin: "8px -16px"}}
-          // iconElementLeft={<img src={logo} className="App-logo" alt="logo" />}
-          showMenuIconButton={false}
-        >
-        </AppBar>
-        <Dialog
-          open={this.state.interfaceLangDialogOpen}
-          onRequestClose={() => this.setState({interfaceLangDialogOpen: false})}
-        >
-          <UidInput
-            onNewRequest={(lang) => {
-              this.setState({interfaceLangDialogOpen: false});
-              this.props.setInterfaceLangvar(lang.id);
-            }}
-            direction={this.state.direction}
-            label={this.props.lngModLabel}
-            interfaceLangvar={this.props.interfaceLangvar}
-          />
-        </Dialog>
+        <header className="mdc-toolbar mdc-toolbar--fixed">
+          <div className="mdc-toolbar__row">
+            <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
+              <span className="mdc-toolbar__title">{this.props.title}</span>
+            </section>
+            <section className="toolbar-section mdc-toolbar__section mdc-toolbar__section--align-end">
+              <a href="https://panlex.org/donate" className="mdc-toolbar__icon">
+                <button className="don-button mdc-button mdc-theme--background">
+                  {this.props.donLabel}
+                </button>
+              </a>            
+              <a 
+                className="material-icons mdc-toolbar__icon toggle"
+                onClick={() => {this.moreMenu.open = !this.moreMenu.open}}
+              >
+                more_vert
+              </a>
+              <div className="mdc-menu-anchor">
+                <div className="mdc-simple-menu" id="more-menu">
+                  <ul className="mdc-simple-menu__items mdc-list" role="menu">
+                    {this.props.debug &&
+                      <li className="mdc-list-item" role="menuitem" onClick={this.props.switchDirection}>
+                        <span className="material-icons">swap_horiz</span>
+                      </li>
+                    }
+                    <li className="mdc-list-item" role="menuitem" onClick={() => this.interfaceLangDialog.show()}>
+                      {this.props.lngModLabel}
+                    </li>
+                    <li className="mdc-list-item" role="menuitem" onClick={this.props.handleTrnTrn}>
+                      {(() => {
+                                switch(this.props.trnTrn) {
+                                  case 1:
+                                    return this.props.trnLabel;
+                                  case 2:
+                                    return this.props.trnTrnLabel;
+                                  default:
+                                    return "";
+                                }
+                              })()}                    
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+          </div>
+        </header>
+        <aside
+          id="interface-lang-dialog" 
+          className="mdc-dialog" 
+          role="alertdialog">
+          <div id="interface-lang-dialog-surface" className="mdc-dialog__surface">
+            <section className="mdc-dialog__body">
+              <span className="material-icons close-button mdc-dialog__footer__button--accept">close</span>
+              <UidInput
+                onNewRequest={(lang) => {
+                  this.interfaceLangDialog.close();
+                  this.props.setInterfaceLangvar(lang.id);
+                }}
+                direction={this.props.direction}
+                label={this.props.lngModLabel}
+                interfaceLangvar={this.props.interfaceLangvar}
+              />
+            </section>
+          </div>
+          <div className="mdc-dialog__backdrop"></div>
+        </aside>
       </div>
   )}
 }

@@ -31,7 +31,8 @@ export default class UidInput extends Component {
               id: s.id, 
               value: (
                 <MenuItem>
-                  <div className='uid-item' style={{direction: this.props.direction}}>
+                  {/* <div className='uid-item' style={{direction: this.props.direction}}> */}
+                  <div className='uid-item' dir={this.props.direction}>
                     <div className='uid-line uid-main'>
                       <span className='uid-name'>{s.trans[0].txt}</span>
                       <span>{s.uid}</span>
@@ -62,7 +63,7 @@ export default class UidInput extends Component {
       originHorizontal = (this.props.direction === 'rtl') ? "right" : "left";
     }
     return (
-      <span className="uid-input" style={this.props.style}>
+      <span className="uid-input" style={this.props.style} dir={this.props.direction}>
         {this.state.loading && <CircularProgress className="loading"/>}
         <AutoComplete
           floatingLabelText={this.props.label}

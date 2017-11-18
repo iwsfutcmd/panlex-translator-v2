@@ -27,11 +27,13 @@ export default class ExprGraph extends Component{
       title: props.lvCache.get(expr.langvar).name_expr_txt,
     }))
     let lastNodeIndex = exprNodes.length - 1;
-    for (let node of [exprNodes[0], exprNodes[lastNodeIndex]]) {
-      node.mass = exprNodes.length - 2;
-      node.font.size = 16;
-      node.font.ital.size = 14;
-      node.shape = "ellipse";
+    if (exprNodes.length) {
+      for (let node of [exprNodes[0], exprNodes[lastNodeIndex]]) {
+        node.mass = exprNodes.length - 2;
+        node.font.size = 16;
+        node.font.ital.size = 14;
+        node.shape = "ellipse";
+      }
     }
     // exprNodes[0].mass = exprNodes.length - 2;
     // exprNodes[0].font.size = 24;
@@ -91,7 +93,7 @@ export default class ExprGraph extends Component{
   
   render() {
     this.options.height = '' + window.innerHeight * 0.70;
-    this.options.width = '' + window.innerWidth * 0.85;
+    // this.options.width = '' + window.innerWidth * 0.85;
     return (
       <Graph 
         graph={this.prepGraph(this.props)}

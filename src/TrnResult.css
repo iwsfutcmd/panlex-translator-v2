@@ -20,11 +20,21 @@
   padding-inline-end: 24px !important;
 }
 
+.graph-button {
+  inline-size: 24px;
+  block-size: 24px;
+  margin: unset;
+  margin-inline-end: 12px;
+  padding: 4px;
+
+}
+
 .bon-bar-background {
   inline-size: 48px;
   block-size: 16px;
   border-radius: 4px;
   overflow: hidden;
+  margin-inline-end: 32px;
 }
 
 .bon-bar {

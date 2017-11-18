@@ -1,5 +1,11 @@
 .App {
-  /*margin: 0px auto;*/
+  --mdc-theme-primary: #C82521;
+  --mdc-theme-primary-light: #DF4A34;
+  --mdc-theme-primary-dark: #700000;
+  --mdc-theme-secondary: #424242;
+  --mdc-theme-secondary-light: #6d6d6d;
+  --mdc-theme-secondary-dark: #1b1b1b;
+  --mdc-theme-background: #ffffff;
 }
 
 .trn {
@@ -34,7 +40,7 @@
 
 .uid-box-button {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
   /*margin-inline-start: 4px;*/
   inline-size: 100%
@@ -77,7 +83,7 @@
 
 .txt-input {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 }
 
 #trn-txt {
@@ -85,7 +91,47 @@
 }
 
 .clear-button {
-  all: initial;
+  /* all: initial; */
   margin-inline-start: -24px;
+  /* margin-block-start: 12px; */
+  padding-block-end: 8px;
   z-index: 1;
+}
+
+.tra-button {
+  min-inline-size: fit-content;
+}
+
+#expr-graph-dialog-surface {
+  max-width: unset;
+  min-width: unset;
+  max-inline-size: 75%;
+}
+
+.mdc-dialog__body {
+  text-align: center;
+}
+
+.close-button {
+  position: absolute;
+  offset-inline-end: 24px;
+  z-index: 2;
+  color: var(--mdc-theme-primary);
+  cursor: pointer;
+}
+
+@supports not (offset-inline-end: 0) {
+  .close-button {
+    right: 24px;
+  }
+}
+
+#txt-input-container {
+  inline-size: 100%;
+}
+
+#txt-input {
+  padding-left: unset;
+  border-bottom: unset;
+  border-block-end: 1px solid rgba(0, 0, 0, .42);
 }

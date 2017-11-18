@@ -20,7 +20,7 @@ export default class LvChips extends Component {
           this.props.langList.map((lang, index) => (
             <div
               key={index}
-              className="chip draggable"
+              className="chip mdc-elevation--z1 draggable"
               draggable={true}
               onDragStart={this.drag}
               onDragEnd={this.dragStop}
