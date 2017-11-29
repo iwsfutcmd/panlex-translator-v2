@@ -25,6 +25,7 @@
 
 #title {
     margin-inline-start: 12px;
+    overflow: visible;
 }
 
 #don-container {
