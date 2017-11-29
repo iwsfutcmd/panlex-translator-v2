@@ -7,6 +7,7 @@ import '@material/menu/dist/mdc.menu.min.css';
 import {MDCSimpleMenu} from '@material/menu/dist/mdc.menu.min';
 import '@material/toolbar/dist/mdc.toolbar.min.css';
 
+import logo from './logo.png';
 // import trnIcon from './trn.svg';
 // import trnTrnIcon from './trn-trn.svg';
 
@@ -32,15 +33,17 @@ export default class PanLexAppBar extends Component{
         <header className="mdc-toolbar mdc-toolbar--fixed">
           <div className="mdc-toolbar__row">
             <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
-              <span className="mdc-toolbar__title">{this.props.title}</span>
+              <img id="logo" src={logo} alt={this.props.panlexLabel}/>
+              <span id="title" className="mdc-toolbar__title">{this.props.title}</span>
             </section>
             <section className="toolbar-section mdc-toolbar__section mdc-toolbar__section--align-end">
-              <a href="https://panlex.org/donate" className="mdc-toolbar__icon">
+              <a id="don-container" href="https://panlex.org/donate" className="mdc-toolbar__icon">
                 <button className="don-button mdc-button mdc-theme--background">
                   {this.props.donLabel}
                 </button>
               </a>            
               <a 
+                id="menu-icon"
                 className="material-icons mdc-toolbar__icon toggle"
                 onClick={() => {this.moreMenu.open = !this.moreMenu.open}}
               >

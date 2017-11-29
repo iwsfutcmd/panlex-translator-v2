@@ -18,7 +18,6 @@ import countBy from 'lodash/countBy';
 import orderBy from 'lodash/orderBy';
 
 import './App.css';
-import logo from './logo.svg';
 import { query, getTranslations, getMultTranslations, getTransPath, getAllTranslations } from './api';
 import LvInfo from './LvInfo';
 import LvChips from './LvChips';
@@ -306,6 +305,7 @@ class App extends Component {
       <div className="mdc-typography App" dir={this.state.direction}>
         <div>
           <PanLexAppBar 
+            panlexLabel={this.getLabel('PanLex')}
             title={[this.getLabel('PanLex'), this.getLabel('tra')].join(' — ')}
             lngModLabel={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
             donLabel={this.getLabel('don')}
