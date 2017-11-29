@@ -2,7 +2,7 @@
   cursor: grab !important;
 }
 
-.lng-chip-names {
+.lv-chip-names {
   visibility: hidden;
   position: absolute;
   background-color: black;
@@ -13,7 +13,7 @@
   left: 0;
 }
 
-.lng-chip:hover .lng-chip-names {
+.lv-chip:hover .lv-chip-names {
   visibility: visible;
 }
 

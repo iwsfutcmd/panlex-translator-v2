@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 
-import 'material-components-web/dist/material-components-web.css';
-import * as mdc from 'material-components-web/dist/material-components-web.js';
+import '@material/dialog/dist/mdc.dialog.min.css';
+import {MDCDialog} from '@material/dialog/dist/mdc.dialog.min';
+import '@material/list/dist/mdc.list.min.css';
+import '@material/menu/dist/mdc.menu.min.css';
+import {MDCSimpleMenu} from '@material/menu/dist/mdc.menu.min';
+import '@material/toolbar/dist/mdc.toolbar.min.css';
 
 // import trnIcon from './trn.svg';
 // import trnTrnIcon from './trn-trn.svg';
 
 import './PanLexAppBar.css';
-import UidInput from './UidInput';
+import LvInput from './LvInput';
 
 export default class PanLexAppBar extends Component{
   constructor(props) {
@@ -18,8 +22,8 @@ export default class PanLexAppBar extends Component{
   }
   
   componentDidMount() {
-    this.interfaceLangDialog = new mdc.dialog.MDCDialog(document.querySelector('#interface-lang-dialog'));
-    this.moreMenu = new mdc.menu.MDCSimpleMenu(document.querySelector('#more-menu'));
+    this.interfaceLangDialog = new MDCDialog(document.querySelector('#interface-lang-dialog'));
+    this.moreMenu = new MDCSimpleMenu(document.querySelector('#more-menu'));
   }
 
   render () {
@@ -78,15 +82,15 @@ export default class PanLexAppBar extends Component{
           <div id="interface-lang-dialog-surface" className="mdc-dialog__surface">
             <section className="mdc-dialog__body">
               <span className="material-icons close-button mdc-dialog__footer__button--accept">close</span>
-              <UidInput
-                onNewRequest={(lang) => {
-                  this.interfaceLangDialog.close();
-                  this.props.setInterfaceLangvar(lang.id);
-                }}
-                direction={this.props.direction}
+              <LvInput
                 label={this.props.lngModLabel}
-                interfaceLangvar={this.props.interfaceLangvar}
+                interfaceLangvar={this.state.interfaceLangvar}                        
+                onNewRequest={lv => {
+                  this.interfaceLangDialog.close();
+                  this.props.setInterfaceLangvar(lv);
+                }}
               />
+
             </section>
           </div>
           <div className="mdc-dialog__backdrop"></div>

@@ -5,9 +5,11 @@
   "dependencies": {
     "material-components-web": "^0.25.0",
     "material-ui": "^0.19.0",
-    "react": "16.0.0",
+    "react": "^16.2.0",
+    "react-autosuggest": "^9.3.2",
     "react-dom": "16.0.0",
     "react-graph-vis": "^1.0.1",
+    "react-md-spinner": "^0.2.5",
     "react-scripts": "^1.0.13",
     "rmwc": "^0.0.1-beta10",
     "shebang-loader": "^0.0.1"

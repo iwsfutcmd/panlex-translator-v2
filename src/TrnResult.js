@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 
-import 'material-components-web/dist/material-components-web.css';
+import '@material/elevation/dist/mdc.elevation.min.css';
+import '@material/list/dist/mdc.list.min.css';
+import '@material/theme/dist/mdc.theme.min.css';
 
 import './TrnResult.css';
 import networkIcon from './network.svg';

@@ -8,6 +8,11 @@
     margin-inline-end: 8px;
 }
 
-.toolbar-section {
-    
+#interface-lang-dialog-surface {
+    min-width: unset;
+    inline-size: auto;
+}
+
+#interface-lang-dialog {
+    offset-block-start: -24vh;
 }

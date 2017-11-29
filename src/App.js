@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
 
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import CircularProgress from 'material-ui/CircularProgress';
+import MDSpinner from "react-md-spinner";
 
-import 'material-components-web/dist/material-components-web.css';
-import * as mdc from 'material-components-web/dist/material-components-web.js';
+import '@material/button/dist/mdc.button.min.css';
+import '@material/card/dist/mdc.card.min.css';
+import '@material/dialog/dist/mdc.dialog.min.css';
+import {MDCDialog} from '@material/dialog/dist/mdc.dialog.min';
+import '@material/fab/dist/mdc.fab.min.css';
+import '@material/textfield/dist/mdc.textfield.min.css';
+import {MDCTextField} from '@material/textfield/dist/mdc.textfield.min';
+import '@material/typography/dist/mdc.typography.min.css';
+import '@material/toolbar/dist/mdc.toolbar.min.css';
 
 import debounce from 'lodash/debounce';
 import shuffle from 'lodash/shuffle';
@@ -15,9 +20,9 @@ import orderBy from 'lodash/orderBy';
 import './App.css';
 import logo from './logo.svg';
 import { query, getTranslations, getMultTranslations, getTransPath, getAllTranslations } from './api';
-import LngInfo from './LngInfo';
+import LvInfo from './LvInfo';
 import LvChips from './LvChips';
-import UidInput from './UidInput';
+import LvInput from './LvInput';
 import PanLexAppBar from './PanLexAppBar';
 import TrnResult from './TrnResult';
 import ExprGraph from './ExprGraph';
@@ -32,24 +37,13 @@ const initialInterfaceUid = "eng-000";
 class App extends Component {
   constructor(props) {
     super(props);
-    const muiTheme = getMuiTheme({
-      palette: {
-        primary1Color: "#C82521",
-        primary2Color: "#DF4A34",
-        primary3Color: "#700000",
-        accent1Color: "#424242",
-        accent2Color: "#6d6d6d",
-        accent3Color: "#1b1b1b",
-      }
-    })
     let labelsToTranslate = [
       'PanLex', 'lng', 'tra', 'al', 'de', 'txt', 'mod', 'npo', 'don', 'plu',
-      'trn', 'viz', 'nom', 'kar', 'loc', 'del',
+      'trn', 'viz', 'nom', 'kar', 'loc', 'del', 'nno',
     ]
     
     this.state = {
       compact: window.innerWidth <= compactWidth,
-      muiTheme,
       lvCache: new Map(),
       loading: false,
       exprGraphLoading: false,
@@ -67,6 +61,7 @@ class App extends Component {
       exprGraphOpen: false,
       pathDirect: false,
       labels: labelsToTranslate.reduce((obj, v) => {obj[v] = v; return obj;}, {}),
+      notFound: false,
     }
   }
 
@@ -81,8 +76,8 @@ class App extends Component {
           this.translate().then(() => this.handleTrnExprClick(0))
         }
       });
-    this.exprGraphDialog = new mdc.dialog.MDCDialog(document.querySelector('#expr-graph-dialog'));
-    this.txtInput = new mdc.textField.MDCTextField(document.querySelector('#txt-input-container'));
+    this.exprGraphDialog = new MDCDialog(document.querySelector('#expr-graph-dialog'));
+    this.txtInput = new MDCTextField(document.querySelector('#txt-input-container'));
   }
 
   componentWillUnmount() {
@@ -176,7 +171,6 @@ class App extends Component {
   setLabels = () => {
     getMultTranslations(Object.keys(this.state.labels), 'art-000', this.state.interfaceLangvar).then(
       result => {
-        // let interfaceLangvar
         let labels = Object.keys(this.state.labels).reduce((obj, label) => {
           if (result[label][0]) {
             obj[label] = result[label][0].txt;
@@ -236,7 +230,7 @@ class App extends Component {
       return getTranslations(this.state.txt.trim(), this.state.langDe.id, this.state.langAl.id, this.state.trnTrn)
         .then((result) => {
           let trnTxt = result.length ? result[0].txt : '';
-          this.setState({trnTxt, translations: result, loading: false});
+          this.setState({trnTxt, translations: result, loading: false, notFound: !result.length});
         })
     } else {
       this.setState({loading: false});
@@ -308,178 +302,173 @@ class App extends Component {
   }
 
   render() {
-    this.state.muiTheme.isRtl = (this.state.direction === 'rtl');
     return (
-      // <div className="App" style={{direction: this.state.direction}}>
-      <div className="App" dir={this.state.direction}>
-        <MuiThemeProvider muiTheme={this.state.muiTheme}>
-          <div>
-            <PanLexAppBar 
-              title={[this.getLabel('PanLex'), this.getLabel('tra')].join(' — ')}
-              lngModLabel={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
-              donLabel={this.getLabel('don')}
-              switchDirection={() => this.setState({direction: (this.state.direction === 'rtl') ? 'ltr' : 'rtl'})}
-              setInterfaceLangvar={langvar => {
-                this.setState({ 
-                  interfaceLangvar: langvar,
-                });
-              }}
-              interfaceLangvar={this.state.interfaceLangvar}
-              trnLabel={this.getLabel('trn')}
-              trnTrnLabel={[this.getLabel('trn'), this.getLabel('trn')].join(' — ')}
-              handleTrnTrn={() => this.setState({trnTrn: (this.state.trnTrn + 1) % 3})}
-              trnTrn={this.state.trnTrn}
-              debug={DEBUG}
-            />
-            <main className="mdc-toolbar-fixed-adjust">
-              <div className="trn">
-                <div className="trn-box">
-                  <div
-                    onDrop={event => {
-                      event.preventDefault();
-                      let langDe = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
-                      if (langDe) {this.setState({langDe})}
-                    }}
-                    onDragOver={event => {event.preventDefault()}}
-                  >
-                    <div className="uid-box">
-                      <div className="uid-box-button">
-                        <UidInput
-                          onNewRequest={(item) => {
-                            let langDe = this.state.lvCache.get(item.id);
-                            this.setState({langDe});
-                          }}
-                          label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
-                          interfaceLangvar={this.state.interfaceLangvar}
-                          align="start"
-                          direction={this.state.direction}
-                        />
-                        <button 
-                          className="mdc-fab mdc-fab--mini material-icons"
-                          onClick={this.swapLng}
-                        >
-                          <span className="mdc-fab__icon">
-                            {this.state.compact ? "swap_vert" : "swap_horiz"}
-                          </span>
-                        </button>
-                      </div>
-                      <LngInfo 
-                        nomLabel={this.getLabel('nom') + " — " + this.fromLvCache(this.state.interfaceLangvar).name_expr_txt + ":"}
-                        karLabel={this.getLabel('kar') + ":"}
-                        locLabel={this.getLabel('loc') + ":"}
-                        lang={this.state.langDe}
-                        onTouchStart={this.state.touchedLv && this.handleTouchLangDe}
-                      />
-                    </div>
-                    <div className="trn-card mdc-card">
-                      <section className="mdc-card__supporting-text">
-                        <div className="txt-input">
-                          <form id="trn-txt">
-                            <div id="txt-input-container" className="mdc-text-field mdc-text-field--with-trailing-icon">
-                              <input 
-                                id="txt-input"
-                                className="mdc-text-field__input"
-                                type="text"
-                                onChange={event => {this.setState({txt: event.target.value})}}
-                                value={this.state.txt}
-                              />
-                              <label className="mdc-text-field__label" htmlFor="txt-input">
-                                {this.getLabel('txt')}
-                              </label>
-                              <i 
-                                className="material-icons mdc-text-field__icon" 
-                                alt={this.getLabel('del')}
-                                tabIndex="0"
-                                onClick={() => {this.setState({txt: ''})}}                                
-                              >
-                                clear
-                              </i>
-                              <div className="mdc-text-field__bottom-line"/>
-                            </div>
-                            <p className="mdc-text-field-helptext mdc-text-field-helptext--validation-msg">
-                              {this.getLabel('npo')}
-                            </p>
-                          </form>
-                        </div>
-                      </section>
-                    </div>
-                  </div>
-                  <LvChips
-                    langList={this.state.langs}
-                    onTouchStart={this.handleTouchLvChip}
-                  />
-                </div>
+      <div className="mdc-typography App" dir={this.state.direction}>
+        <div>
+          <PanLexAppBar 
+            title={[this.getLabel('PanLex'), this.getLabel('tra')].join(' — ')}
+            lngModLabel={[this.getLabel('lng'), this.getLabel('mod')].join(' — ')}
+            donLabel={this.getLabel('don')}
+            switchDirection={() => this.setState({direction: (this.state.direction === 'rtl') ? 'ltr' : 'rtl'})}
+            setInterfaceLangvar={langvar => {
+              this.setState({ 
+                interfaceLangvar: langvar,
+              });
+            }}
+            interfaceLangvar={this.state.interfaceLangvar}
+            trnLabel={this.getLabel('trn')}
+            trnTrnLabel={[this.getLabel('trn'), this.getLabel('trn')].join(' — ')}
+            handleTrnTrn={() => this.setState({trnTrn: (this.state.trnTrn + 1) % 3})}
+            trnTrn={this.state.trnTrn}
+            debug={DEBUG}
+          />
+          <main className="mdc-toolbar-fixed-adjust">
+            <div className="trn">
+              <div className="trn-box">
                 <div
-                  className="trn-box"
                   onDrop={event => {
                     event.preventDefault();
-                    let langAl = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
-                    if (langAl) {this.setState({langAl})}
+                    let langDe = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
+                    if (langDe) {this.setState({langDe})}
                   }}
                   onDragOver={event => {event.preventDefault()}}
                 >
                   <div className="uid-box">
                     <div className="uid-box-button">
-                      <UidInput
-                        onNewRequest={(item) => {
-                          let langAl = this.state.lvCache.get(item.id);
-                          this.setState({langAl});
+                      <LvInput
+                        label={[this.getLabel('lng'), this.getLabel('de')].join(' — ')}
+                        interfaceLangvar={this.state.interfaceLangvar}                        
+                        onNewRequest={lv => {
+                          let langDe = this.state.lvCache.get(lv);
+                          this.setState({langDe});
                         }}
-                        label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
-                        interfaceLangvar={this.state.interfaceLangvar}
-                        align="start"
-                        direction={this.state.direction}
                       />
                       <button 
-                        onClick={this.translate}
-                        type="submit"
-                        className="tra-button mdc-button mdc-button--raised"
-                        form="trn-txt"
+                        className="mdc-fab mdc-fab--mini material-icons"
+                        onClick={this.swapLng}
                       >
-                        {this.getLabel('tra')}
+                        <span className="mdc-fab__icon">
+                          {this.state.compact ? "swap_vert" : "swap_horiz"}
+                        </span>
                       </button>
                     </div>
-                    <LngInfo 
+                    <LvInfo 
                       nomLabel={this.getLabel('nom') + " — " + this.fromLvCache(this.state.interfaceLangvar).name_expr_txt + ":"}
                       karLabel={this.getLabel('kar') + ":"}
                       locLabel={this.getLabel('loc') + ":"}
-                      lang={this.state.langAl}
-                      onTouchStart={this.state.touchedLv && this.handleTouchLangAl}
+                      lang={this.state.langDe}
+                      onTouchStart={this.state.touchedLv && this.handleTouchLangDe}
                     />
                   </div>
                   <div className="trn-card mdc-card">
-                    <section className="card-title mdc-card__primary">
-                      <h1 className="mdc-card__title mdc-card__title--large">{this.state.trnTxt}</h1>
-                      {this.state.loading ? <CircularProgress/> : ''}
-                    </section>
                     <section className="mdc-card__supporting-text">
-                      <TrnResult
-                        translations={this.state.translations}
-                        onExprClick={this.handleTrnExprClick}
-                        graphButtonAlt={[this.getLabel('trn'), this.getLabel('viz')].join(' — ')}
-                      />
+                      <div className="txt-input">
+                        <form id="trn-txt">
+                          <div id="txt-input-container" className="mdc-text-field mdc-text-field--with-trailing-icon">
+                            <input 
+                              id="txt-input"
+                              className="mdc-text-field__input"
+                              type="text"
+                              onChange={event => {this.setState({txt: event.target.value})}}
+                              value={this.state.txt}
+                            />
+                            <label className="mdc-text-field__label" htmlFor="txt-input">
+                              {this.getLabel('txt')}
+                            </label>
+                            <i 
+                              className="material-icons mdc-text-field__icon" 
+                              alt={this.getLabel('del')}
+                              tabIndex="0"
+                              onClick={() => {this.setState({txt: ''})}}                                
+                            >
+                              clear
+                            </i>
+                            <div className="mdc-text-field__bottom-line"/>
+                          </div>
+                          <p className="mdc-text-field-helptext mdc-text-field-helptext--validation-msg">
+                            {this.getLabel('npo')}
+                          </p>
+                        </form>
+                      </div>
                     </section>
                   </div>
                 </div>
+                <LvChips
+                  langList={this.state.langs}
+                  onTouchStart={this.handleTouchLvChip}
+                />
               </div>
-            </main>
-            <aside
-              id="expr-graph-dialog" 
-              className="mdc-dialog" 
-              role="alertdialog">
-              <div id="expr-graph-dialog-surface" className="mdc-dialog__surface">
-                <section className="mdc-dialog__body">
-                  <span className="material-icons close-button mdc-dialog__footer__button--accept">close</span>
-                  {this.state.exprGraphLoading ? 
-                    <CircularProgress/> :
-                    <ExprGraph pathExprs={this.state.pathExprs} pathDirect={this.state.pathDirect} lvCache={this.state.lvCache}/>
-                  }
-                </section>
+              <div
+                className="trn-box"
+                onDrop={event => {
+                  event.preventDefault();
+                  let langAl = this.state.lvCache.get(parseInt(event.dataTransfer.getData("text"), 10));
+                  if (langAl) {this.setState({langAl})}
+                }}
+                onDragOver={event => {event.preventDefault()}}
+              >
+                <div className="uid-box">
+                  <div className="uid-box-button">
+                    <LvInput
+                      label={[this.getLabel('lng'), this.getLabel('al')].join(' — ')}
+                      interfaceLangvar={this.state.interfaceLangvar}                        
+                      onNewRequest={lv => {
+                        let langAl = this.state.lvCache.get(lv);
+                        this.setState({langAl});
+                      }}
+                    />
+                    <button 
+                      onClick={this.translate}
+                      type="submit"
+                      className="tra-button mdc-button mdc-button--raised"
+                      form="trn-txt"
+                    >
+                      {this.getLabel('tra')}
+                    </button>
+                  </div>
+                  <LvInfo 
+                    nomLabel={this.getLabel('nom') + " — " + this.fromLvCache(this.state.interfaceLangvar).name_expr_txt + ":"}
+                    karLabel={this.getLabel('kar') + ":"}
+                    locLabel={this.getLabel('loc') + ":"}
+                    lang={this.state.langAl}
+                    onTouchStart={this.state.touchedLv && this.handleTouchLangAl}
+                  />
+                </div>
+                <div className="trn-card mdc-card">
+                  <section className="card-title mdc-card__primary">
+                    {this.state.notFound ? 
+                      <span className="mdc-typography--caption" id="nno-label">{this.getLabel('nno')}</span> :
+                      <h1 className="mdc-card__title mdc-card__title--large">{this.state.trnTxt}</h1>
+                    }
+                    {this.state.loading ? <MDSpinner singleColor="#C82521"/> : ''}
+                  </section>
+                  <section className="mdc-card__supporting-text">
+                    <TrnResult
+                      translations={this.state.translations}
+                      onExprClick={this.handleTrnExprClick}
+                      graphButtonAlt={[this.getLabel('trn'), this.getLabel('viz')].join(' — ')}
+                    />
+                  </section>
+                </div>
               </div>
-              <div className="mdc-dialog__backdrop"></div>
-            </aside>
-          </div>
-        </MuiThemeProvider>
+            </div>
+          </main>
+          <aside
+            id="expr-graph-dialog" 
+            className="mdc-dialog" 
+            role="alertdialog">
+            <div id="expr-graph-dialog-surface" className="mdc-dialog__surface">
+              <section className="mdc-dialog__body">
+                <span className="material-icons close-button mdc-dialog__footer__button--accept">close</span>
+                {this.state.exprGraphLoading ? 
+                  <MDSpinner singleColor="#C82521"/> :
+                  <ExprGraph pathExprs={this.state.pathExprs} pathDirect={this.state.pathDirect} lvCache={this.state.lvCache}/>
+                }
+              </section>
+            </div>
+            <div className="mdc-dialog__backdrop"></div>
+          </aside>
+        </div>
       </div>
     );
   }

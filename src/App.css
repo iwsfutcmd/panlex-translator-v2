@@ -131,7 +131,11 @@
 }
 
 #txt-input {
-  padding-left: unset;
+  padding-inline-start: unset;
   border-bottom: unset;
   border-block-end: 1px solid rgba(0, 0, 0, .42);
+}
+
+#nno-label {
+  font-style: oblique;
 }

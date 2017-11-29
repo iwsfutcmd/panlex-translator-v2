@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import '@material/elevation/dist/mdc.elevation.min.css';
+
 import './LvChips.css';
 
 export default class LvChips extends Component {

@@ -1,28 +1,38 @@
-.uid-input {
+.lv-input-container {
   display: flex;
   justify-content: flex-end;
 }
 
-.uid-line {
+.lv-item {
+  inline-size: 100%;
+}
+
+.lv-line {
   line-height: normal;
 }
 
-.uid-main {
+.lv-main-line {
   display: flex;
   justify-content: space-between;
 }
 
-.uid-name {
+.lv-name {
   margin-inline-end: 8px;
 }
 
-.uid-alt {
+.lv-alt-line {
   margin-inline-start: 8px;
   font-size: small;
   color: darkgray;
+  text-align: start;
 }
 
 .loading {
   align-self: center;
   position: absolute !important;
+}
+
+#suggest-menu {
+  max-height: unset;
+  max-block-size: 240px;
 }
