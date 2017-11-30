@@ -110,7 +110,14 @@ class App extends Component {
   }
 
   cacheLvs = () => (
-    query('/langvar', {limit: 0}).then(
+    query('/langvar', {limit: 0, exclude: [
+      'grp', 
+      'lang_code', 
+      'mutable', 
+      'name_expr',
+      'name_expr_txt_degr',
+      'var_code',
+     ]}).then(
       r => {
         let lvCache = new Map();
         r.result.forEach(lv => {lvCache.set(lv.id, lv)});
