@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import MDSpinner from "react-md-spinner";
-
 import '@material/button/dist/mdc.button.min.css';
 import '@material/card/dist/mdc.card.min.css';
 import '@material/dialog/dist/mdc.dialog.min.css';
@@ -26,6 +24,8 @@ import PanLexAppBar from './PanLexAppBar';
 import TrnResult from './TrnResult';
 import ExprGraph from './ExprGraph';
 import './material.css';
+import LoadingIcon from './LoadingIcon';
+
 
 const compactWidth = 840
 
@@ -447,7 +447,7 @@ class App extends Component {
                       <span className="mdc-typography--caption" id="nno-label">{this.getLabel('nno')}</span> :
                       <h1 className="mdc-card__title mdc-card__title--large">{this.state.trnTxt}</h1>
                     }
-                    {this.state.loading ? <MDSpinner singleColor="#C82521"/> : ''}
+                    {this.state.loading ? <LoadingIcon/> : ''}
                   </section>
                   <section className="mdc-card__supporting-text">
                     <TrnResult
@@ -468,7 +468,7 @@ class App extends Component {
               <section className="mdc-dialog__body">
                 <span className="material-icons close-button mdc-dialog__footer__button--accept">close</span>
                 {this.state.exprGraphLoading ? 
-                  <MDSpinner singleColor="#C82521"/> :
+                  <LoadingIcon size={64}/> :
                   <ExprGraph pathExprs={this.state.pathExprs} pathDirect={this.state.pathDirect} lvCache={this.state.lvCache}/>
                 }
               </section>

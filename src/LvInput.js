@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import MDSpinner from "react-md-spinner";
-
 import '@material/list/dist/mdc.list.min.css';
 import '@material/menu/dist/mdc.menu.min.css';
 import {MDCSimpleMenu} from '@material/menu/dist/mdc.menu.min';
@@ -11,6 +9,7 @@ import {MDCTextField} from '@material/textfield/dist/mdc.textfield.min';
 import debounce from 'lodash/debounce';
 import { query } from './api';
 import './LvInput.css';
+import LoadingIcon from './LoadingIcon';
 
 export default class UidInput extends Component {
   constructor(props) {
@@ -68,7 +67,7 @@ export default class UidInput extends Component {
     return (
       <span>
         <span className="lv-input-container" style={this.props.style} dir={this.props.direction}>
-          {this.state.loading && <MDSpinner singleColor="#C82521" className="loading"/>}
+          {this.state.loading && <div className="loading"><LoadingIcon/></div>}
           <div 
             ref={div => {if (div) {this.lvInput = new MDCTextField(div)}}}
             className="mdc-text-field mdc-text-field--upgraded"
