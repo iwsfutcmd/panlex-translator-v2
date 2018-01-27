@@ -25,7 +25,7 @@ export default class TrnResult extends Component {
                 alt={this.props.graphButtonAlt}
                 data-index={index}
               />
-              <div 
+              <div
                 className="bon-bar-background mdc-theme--secondary-light-bg" 
               >
                 <div 
@@ -33,7 +33,12 @@ export default class TrnResult extends Component {
                   style={{inlineSize: (trn.trans_quality / maxBon) * 100 + '%'}}
                 />
               </div>
-              {trn.txt}
+              <details onToggle={() => this.props.onTrnToggle(index)}>
+                <summary className="trn-summary">{trn.txt}</summary>
+                <div className="back-translations mdc-typography--caption">
+                  {trn.backTranslations && trn.backTranslations.map(trn => trn.txt).join(' — ')}
+                </div>
+              </details>
             </li>
         )})}
       </ul>

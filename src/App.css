@@ -1,3 +1,7 @@
+* {
+  letter-spacing: unset !important;
+}
+
 .App {
   --mdc-theme-primary: #C82521;
   --mdc-theme-primary-light: #DF4A34;

@@ -243,6 +243,16 @@ class App extends Component {
     }
   }
 
+  backTranslate = trnIndex => {
+    let trn = this.state.translations[trnIndex];
+    getTranslations(trn.txt, trn.langvar, trn.trans_langvar)
+      .then(result => {
+        let translations = this.state.translations;
+        translations[trnIndex].backTranslations = result;
+        this.setState({translations});
+      })
+  }
+
   swapLng = (event) => {
     this.setState(prevState => ({
       langDe: prevState.langAl,
@@ -453,6 +463,7 @@ class App extends Component {
                     <TrnResult
                       translations={this.state.translations}
                       onExprClick={this.handleTrnExprClick}
+                      onTrnToggle={this.backTranslate}
                       graphButtonAlt={[this.getLabel('trn'), this.getLabel('viz')].join(' — ')}
                     />
                   </section>

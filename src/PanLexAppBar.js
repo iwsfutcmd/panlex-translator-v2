@@ -33,7 +33,9 @@ export default class PanLexAppBar extends Component{
         <header className="mdc-toolbar mdc-toolbar--fixed">
           <div className="mdc-toolbar__row">
             <section className="mdc-toolbar__section mdc-toolbar__section--align-start">
-              <img id="logo" src={logo} alt={this.props.panlexLabel}/>
+              <a id="logo" href="https://panlex.org">
+                <img src={logo} alt={this.props.panlexLabel}/>
+              </a>
               <span id="title" className="mdc-toolbar__title">{this.props.title}</span>
             </section>
             <section className="toolbar-section mdc-toolbar__section mdc-toolbar__section--align-end">
