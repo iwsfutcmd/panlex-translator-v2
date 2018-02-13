@@ -22,7 +22,7 @@ class BackTrn extends Component {
     return (
       <ul className="mdc-list mdc-list--dense">
       {this.props.translations.map( trn => (
-        <li className="mdc-list-item back-trn-item">
+        <li className="mdc-list-item mdc-ripple-surface back-trn-item">
           <div className="bon-bar-cell-dense">
             <BonBar bon={trn.trans_quality / maxBon}/>
           </div>
@@ -45,7 +45,7 @@ export default class TrnResult extends Component {
           return (
             <details onToggle={() => this.props.onTrnToggle(index)}>
               <summary className="trn-summary">
-                <li className="mdc-list-item" key={index}>
+                <li className="mdc-list-item mdc-ripple-surface" key={index}>
                   <div
                     className="graph-button material-icons mdc-elevation--z3"
                     onClick={this.openGraph}

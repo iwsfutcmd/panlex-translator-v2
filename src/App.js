@@ -9,6 +9,7 @@ import '@material/textfield/dist/mdc.textfield.min.css';
 import {MDCTextField} from '@material/textfield/dist/mdc.textfield.min';
 import '@material/typography/dist/mdc.typography.min.css';
 import '@material/toolbar/dist/mdc.toolbar.min.css';
+import '@material/ripple/dist/mdc.ripple.min.css';
 
 import debounce from 'lodash/debounce';
 import shuffle from 'lodash/shuffle';
@@ -52,7 +53,7 @@ class App extends Component {
       langDe: {},
       langAl: {},
       langs: [],
-      txt: DEBUG ? "house" : '',
+      txt: sessionStorage.getItem("txt") || "",
       txtError: false,
       trnTxt: '',
       trnTrn: 0,
@@ -73,9 +74,7 @@ class App extends Component {
   componentDidMount() {
     this.cacheLvs().then(
       () => this.getInitialLangs(initialUids)).then(
-        () => {if (DEBUG) {
-          this.translate().then(() => this.handleTrnExprClick(0))
-        }
+        () => {if (this.state.txt) {this.translate()}
       });
     this.exprGraphDialog = new MDCDialog(document.querySelector('#expr-graph-dialog'));
     this.txtInput = new MDCTextField(document.querySelector('#txt-input-container'));
@@ -110,7 +109,9 @@ class App extends Component {
         () => {this.translate(); this.getOtherNames()}
       )
     }
-    if (prevState.txt !== this.state.txt) {this.validateTxt()}
+    if (prevState.txt !== this.state.txt) {
+      this.validateTxt();
+    }
   }
 
   cacheLvs = () => (
@@ -170,8 +171,8 @@ class App extends Component {
       }
     })
     this.setState({
-      langDe: this.state.lvCache.get(localStorage.getItem("langDe")) || interfaceLv,
-      langAl: this.state.lvCache.get(localStorage.getItem("langAl")) || shuffle(langs)[0],
+      langDe: this.state.lvCache.get(Number(localStorage.getItem("langDe"))) || interfaceLv,
+      langAl: this.state.lvCache.get(Number(localStorage.getItem("langAl"))) || shuffle(langs)[0],
       langs: shuffle(langs),
       interfaceLangvar: interfaceLv.id
     });
@@ -212,6 +213,7 @@ class App extends Component {
   }
 
   validateTxt = debounce(() => {
+    sessionStorage.setItem("txt", this.state.txt);
     if (this.state.txt.trim() && this.state.langDe.id) {
       query('/expr/count', {langvar: this.state.langDe.id, txt: this.state.txt.trim()})
         .then((response) => {
