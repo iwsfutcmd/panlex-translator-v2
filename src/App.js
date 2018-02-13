@@ -31,7 +31,9 @@ const compactWidth = 840
 
 const DEBUG = false;
 
-const initialUids = ['uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000'];
+const initialUids = [
+  'uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000'
+];
 const initialInterfaceUid = "eng-000";
 class App extends Component {
   constructor(props) {
@@ -95,12 +97,14 @@ class App extends Component {
       // mdc.ripple.MDCRipple.attachTo(document.querySelector('.mdc-button'));
     }
     if (prevState.langDe.id && (prevState.langDe.id !== this.state.langDe.id)) {
+      localStorage.setItem("langDe", this.state.langDe.id);
       this.setState(
         {langs: [...new Set([prevState.langDe, ...prevState.langs])]},
         () => {this.translate(); this.validateTxt(); this.getOtherNames()}
       )
     }
     if (prevState.langAl.id && (prevState.langAl.id !== this.state.langAl.id)) {
+      localStorage.setItem("langAl", this.state.langAl.id);
       this.setState(
         {langs: [...new Set([prevState.langAl, ...prevState.langs])]},
         () => {this.translate(); this.getOtherNames()}
@@ -166,8 +170,8 @@ class App extends Component {
       }
     })
     this.setState({
-      langDe: interfaceLv,
-      langAl: shuffle(langs)[0],
+      langDe: this.state.lvCache.get(localStorage.getItem("langDe")) || interfaceLv,
+      langAl: this.state.lvCache.get(localStorage.getItem("langAl")) || shuffle(langs)[0],
       langs: shuffle(langs),
       interfaceLangvar: interfaceLv.id
     });
@@ -364,7 +368,7 @@ class App extends Component {
                         className="mdc-fab mdc-fab--mini material-icons"
                         onClick={this.swapLng}
                       >
-                        <span className="mdc-fab__icon">
+                        <span className="mdc-fab__icon" id="swap-icon">
                           {this.state.compact ? "swap_vert" : "swap_horiz"}
                         </span>
                       </button>

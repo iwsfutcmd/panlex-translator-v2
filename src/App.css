@@ -6,9 +6,9 @@
   --mdc-theme-primary: #C82521;
   --mdc-theme-primary-light: #DF4A34;
   --mdc-theme-primary-dark: #700000;
-  --mdc-theme-secondary: #424242;
-  --mdc-theme-secondary-light: #6d6d6d;
-  --mdc-theme-secondary-dark: #1b1b1b;
+  --mdc-theme-secondary: #aeaeae;
+  --mdc-theme-secondary-light: #e0e0e0;
+  --mdc-theme-secondary-dark: #7f7f7f;
   --mdc-theme-background: #ffffff;
 }
 
@@ -142,4 +142,8 @@
 
 #nno-label {
   font-style: oblique;
+}
+
+#swap-icon {
+  color: black;
 }

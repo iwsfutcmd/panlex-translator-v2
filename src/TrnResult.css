@@ -1,19 +1,22 @@
-.trn-row {
+/* .trn-row {
   block-size: 40px !important;
-  /*display: flex;*/
-  /*align-items: center;*/
+  display: flex;
+  align-items: center;
 }
 
 .trn-row td {
   text-align: start !important;
   block-size: 40px !important;
-}
-
-/* .bon-bar-cell {
-  inline-size: 48px;
-  padding: unset !important;
 } */
 
+.bon-bar-cell {
+  margin-inline-end: 32px;
+}
+
+.bon-bar-cell-dense {
+  margin-inline-end: 8px;
+  transform: scale(0.812);
+}
 
 .graph-button-cell {
   min-inline-size: 36px;
@@ -27,22 +30,27 @@
   margin: unset;
   margin-inline-end: 12px;
   padding: 4px;
+  cursor: pointer;
+  user-select: none;
+}
 
+@media (max-width: 840px) {
+  .bon-bar-cell {
+    margin-inline-end: 12px !important;
+  }
 }
 
 .bon-bar-background {
-  min-inline-size: 48px;
   block-size: 16px;
+  inline-size: 48px;
   border-radius: 4px;
   overflow: hidden;
-  margin-inline-end: 32px;
 }
 
 .bon-bar {
   block-size: 100%;
   border-radius: inherit;
 }
-
 
 .trn-cell {
   font-size: 16px !important;
@@ -58,4 +66,8 @@
 
 .back-translations {
   color: grey;
+}
+
+.back-trn-item {
+  height: unset !important;
 }

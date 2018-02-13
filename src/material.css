@@ -13,7 +13,6 @@
 .chip {
   block-size: 32px;
   border-radius: 16px;
-  background-color: rgb(224, 224, 224);
   inline-size: fit-content;
   inline-size: -moz-fit-content;
   box-sizing: border-box;

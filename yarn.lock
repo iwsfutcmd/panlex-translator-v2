@@ -4931,6 +4931,10 @@ pluralize@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-7.0.0.tgz#298b89df8b93b0221dbf421ad2b1b1ea23fc6777"
 
+pnormaldist@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/pnormaldist/-/pnormaldist-1.0.1.tgz#a5d6b8bf2175c5084ebef2430c79f7379f8430ce"
+
 portfinder@^1.0.9:
   version "1.0.13"
   resolved "https://registry.yarnpkg.com/portfinder/-/portfinder-1.0.13.tgz#bb32ecd87c27104ae6ee44b5a3ccbf0ebb1aede9"

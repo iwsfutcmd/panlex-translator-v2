@@ -19,4 +19,5 @@
 
 .drop-highlight {
   border: 1px dashed black !important;
+  background-color: var(--mdc-theme-primary) !important;
 }

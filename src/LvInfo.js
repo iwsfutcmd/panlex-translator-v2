@@ -9,7 +9,7 @@ export default class LvInfo extends Component {
     return (
       <div className="lv-info-box">
         <div
-          className="chip mdc-elevation--z1 droppable"
+          className="chip mdc-theme--secondary-light-bg mdc-elevation--z1 droppable"
           onTouchStart={this.props.onTouchStart}
         >
           <span className="chip-label">{this.props.lang.name_expr_txt}</span>
