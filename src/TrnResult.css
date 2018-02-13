@@ -64,8 +64,8 @@
   display: none;
 }
 
-.back-translations {
-  color: grey;
+.back-trn-container {
+  padding-inline-start: 16px;
 }
 
 .back-trn-item {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import '@material/list/dist/mdc.list.min.css';
 import '@material/menu/dist/mdc.menu.min.css';
-import {MDCSimpleMenu} from '@material/menu/dist/mdc.menu.min';
+import {MDCMenu} from '@material/menu/dist/mdc.menu.min';
 import '@material/textfield/dist/mdc.textfield.min.css';
 import {MDCTextField} from '@material/textfield/dist/mdc.textfield.min';
 
@@ -26,6 +26,7 @@ export default class UidInput extends Component {
       () => {
         this.setState({searchText: ''}); 
         this.props.onNewRequest(s.id);
+        this.suggestMenu.open = false;
       }} 
       key={s.id}> 
       <div className='lv-item' dir={this.props.direction}>
@@ -80,20 +81,21 @@ export default class UidInput extends Component {
               onChange={this.onChange}
             />
             <label className="mdc-text-field__label" htmlFor="lv-input">{this.props.label}</label>
-            <div className="mdc-text-field__bottom-line"/>
+            <div className="mdc-line-ripple"/>
           </div>
         </span>
-        <div className="mdc-menu-anchor">
+        {this.state.suggestions.length ? 
           <div 
-            ref={div => {if (div) {this.suggestMenu = new MDCSimpleMenu(div)}}}
+            ref={div => {if (div) {this.suggestMenu = new MDCMenu(div)}}}
             id="suggest-menu"
-            className="mdc-simple-menu"
+            className="mdc-menu"
           >
-            <ul className="mdc-simple-menu__items mdc-list" role="menu">
+            <ul className="mdc-menu__items mdc-list" role="menu">
               {this.state.suggestions.map(s => this.renderSuggestion(s))}
             </ul>
           </div>
-        </div>
+          : ""
+        }
       </span>
     )
   }

@@ -384,35 +384,33 @@ class App extends Component {
                     />
                   </div>
                   <div className="trn-card mdc-card">
-                    <section className="mdc-card__supporting-text">
-                      <div className="txt-input">
-                        <form id="trn-txt">
-                          <div id="txt-input-container" className="mdc-text-field mdc-text-field--with-trailing-icon">
-                            <input 
-                              id="txt-input"
-                              className="mdc-text-field__input"
-                              type="text"
-                              onChange={event => {this.setState({txt: event.target.value})}}
-                              value={this.state.txt}
-                            />
-                            <label className="mdc-text-field__label" htmlFor="txt-input">
-                              {this.getLabel('txt')}
-                            </label>
-                            <i 
-                              className="material-icons mdc-text-field__icon" 
-                              alt={this.getLabel('del')}
-                              tabIndex="0"
-                              onClick={() => {this.setState({txt: ''})}}                                
-                            >
-                              clear
-                            </i>
-                            <div className="mdc-text-field__bottom-line"/>
-                          </div>
-                          <p className="mdc-text-field-helptext mdc-text-field-helptext--validation-msg">
-                            {this.getLabel('npo')}
-                          </p>
-                        </form>
-                      </div>
+                    <section className="txt-input">
+                      <form id="trn-txt">
+                        <div id="txt-input-container" className="mdc-text-field mdc-text-field--with-trailing-icon">
+                          <input 
+                            id="txt-input"
+                            className="mdc-text-field__input"
+                            type="text"
+                            onChange={event => {this.setState({txt: event.target.value})}}
+                            value={this.state.txt}
+                          />
+                          <label className="mdc-text-field__label" htmlFor="txt-input">
+                            {this.getLabel('txt')}
+                          </label>
+                          <i 
+                            className="material-icons mdc-text-field__icon" 
+                            alt={this.getLabel('del')}
+                            tabIndex="0"
+                            onClick={() => {this.setState({txt: ''})}}                                
+                          >
+                            clear
+                          </i>
+                          <div className="mdc-line-ripple"/>
+                        </div>
+                        <p className="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                          {this.getLabel('npo')}
+                        </p>
+                      </form>
                     </section>
                   </div>
                 </div>
@@ -458,21 +456,19 @@ class App extends Component {
                   />
                 </div>
                 <div className="trn-card mdc-card">
-                  <section className="card-title mdc-card__primary">
+                  <section className="card-title">
                     {this.state.notFound ? 
                       <span className="mdc-typography--caption" id="nno-label">{this.getLabel('nno')}</span> :
-                      <h1 className="mdc-card__title mdc-card__title--large">{this.state.trnTxt}</h1>
+                      <span id="first-trn-txt">{this.state.trnTxt}</span>
                     }
                     {this.state.loading ? <LoadingIcon/> : ''}
                   </section>
-                  <section className="mdc-card__supporting-text">
-                    <TrnResult
-                      translations={this.state.translations}
-                      onExprClick={this.handleTrnExprClick}
-                      onTrnToggle={this.backTranslate}
-                      graphButtonAlt={[this.getLabel('trn'), this.getLabel('viz')].join(' — ')}
-                    />
-                  </section>
+                  <TrnResult
+                    translations={this.state.translations}
+                    onExprClick={this.handleTrnExprClick}
+                    onTrnToggle={this.backTranslate}
+                    graphButtonAlt={[this.getLabel('trn'), this.getLabel('viz')].join(' — ')}
+                  />
                 </div>
               </div>
             </div>

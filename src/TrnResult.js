@@ -21,8 +21,8 @@ class BackTrn extends Component {
     let maxBon = (this.props.translations.length) ? this.props.translations[0].trans_quality : 1;
     return (
       <ul className="mdc-list mdc-list--dense">
-      {this.props.translations.map( trn => (
-        <li className="mdc-list-item mdc-ripple-surface back-trn-item">
+      {this.props.translations.map( (trn, index) => (
+        <li key={index} className="mdc-list-item mdc-ripple-surface back-trn-item">
           <div className="bon-bar-cell-dense">
             <BonBar bon={trn.trans_quality / maxBon}/>
           </div>
@@ -43,7 +43,7 @@ export default class TrnResult extends Component {
       <ul className="mdc-list">  
         {this.props.translations.map( (trn, index) => {
           return (
-            <details onToggle={() => this.props.onTrnToggle(index)}>
+            <details key={index} onToggle={() => this.props.onTrnToggle(index)}>
               <summary className="trn-summary">
                 <li className="mdc-list-item mdc-ripple-surface" key={index}>
                   <div
@@ -60,10 +60,12 @@ export default class TrnResult extends Component {
                   {trn.txt}
                 </li>
               </summary>
-              {trn.backTranslations && [
-                <BackTrn translations={trn.backTranslations}/>,
-                <li className="mdc-list-divider" role="separator"/>
-              ]}
+              {trn.backTranslations && 
+                <div className="back-trn-container">
+                  <BackTrn translations={trn.backTranslations}/>
+                  <li className="mdc-list-divider" role="separator"/>
+                </div>
+              }
             </details>
         )})}
       </ul>

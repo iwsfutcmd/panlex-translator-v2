@@ -4,7 +4,7 @@ import '@material/dialog/dist/mdc.dialog.min.css';
 import {MDCDialog} from '@material/dialog/dist/mdc.dialog.min';
 import '@material/list/dist/mdc.list.min.css';
 import '@material/menu/dist/mdc.menu.min.css';
-import {MDCSimpleMenu} from '@material/menu/dist/mdc.menu.min';
+import {MDCMenu} from '@material/menu/dist/mdc.menu.min';
 import '@material/toolbar/dist/mdc.toolbar.min.css';
 
 import logo from './logo.png';
@@ -24,7 +24,7 @@ export default class PanLexAppBar extends Component{
   
   componentDidMount() {
     this.interfaceLangDialog = new MDCDialog(document.querySelector('#interface-lang-dialog'));
-    this.moreMenu = new MDCSimpleMenu(document.querySelector('#more-menu'));
+    this.moreMenu = new MDCMenu(document.querySelector('#more-menu'));
   }
 
   render () {
@@ -52,8 +52,8 @@ export default class PanLexAppBar extends Component{
                 more_vert
               </a>
               <div className="mdc-menu-anchor">
-                <div className="mdc-simple-menu" id="more-menu">
-                  <ul className="mdc-simple-menu__items mdc-list" role="menu">
+                <div className="mdc-menu" id="more-menu">
+                  <ul className="mdc-menu__items mdc-list" role="menu">
                     {this.props.debug &&
                       <li className="mdc-list-item" role="menuitem" onClick={this.props.switchDirection}>
                         <span className="material-icons">swap_horiz</span>

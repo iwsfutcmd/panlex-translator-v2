@@ -78,6 +78,7 @@
 .card-title {
   display: flex;
   justify-content: space-between;
+  padding: 16px;
 }
 
 .card-title button {
@@ -88,6 +89,10 @@
 .txt-input {
   display: flex;
   align-items: flex-start;
+  padding-inline-start: 16px;
+  padding-inline-end: 16px;
+  padding-block-start: 8px;
+  padding-block-end: 24px;
 }
 
 #trn-txt {
@@ -146,4 +151,8 @@
 
 #swap-icon {
   color: black;
+}
+
+#first-trn-txt {
+  font-size: 1.5rem;
 }
