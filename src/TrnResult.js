@@ -26,7 +26,7 @@ class BackTrn extends Component {
           <div className="bon-bar-cell-dense">
             <BonBar bon={trn.trans_quality / maxBon}/>
           </div>
-          {trn.txt}
+          <span tabIndex="0">{trn.txt}</span>
         </li>
       ))}
       </ul>
@@ -46,23 +46,26 @@ export default class TrnResult extends Component {
             <details key={index} onToggle={() => this.props.onTrnToggle(index)}>
               <summary className="trn-summary">
                 <li className="mdc-list-item mdc-ripple-surface" key={index}>
-                  <div
-                    className="graph-button material-icons mdc-elevation--z3"
+                  <button
+                    className="graph-button mdc-elevation--z3"
+                    // className="mdc-button mdc-button--raised"
                     onClick={this.openGraph}
                     alt={this.props.graphButtonAlt}
                     data-index={index}
                   >
-                    more_vert
-                  </div>
+                    <i className="material-icons">
+                      more_vert
+                    </i>
+                  </button>
                   <div className="bon-bar-cell">
                     <BonBar bon={trn.trans_quality / maxBon}/>
                   </div>
-                  {trn.txt}
+                  <span lang={this.props.tagAl} tabIndex="0">{trn.txt}</span>
                 </li>
               </summary>
               {trn.backTranslations && 
                 <div className="back-trn-container">
-                  <BackTrn translations={trn.backTranslations}/>
+                  <BackTrn lang={this.props.tagDe} translations={trn.backTranslations}/>
                   <li className="mdc-list-divider" role="separator"/>
                 </div>
               }
@@ -72,10 +75,3 @@ export default class TrnResult extends Component {
     )
   }
 }
-
-// {trn.backTranslations && <TrnResult
-//   translations={trn.backTranslations}
-//   // onExprClick={this.handleTrnExprClick}
-//   // onTrnToggle={this.backTranslate}
-//   graphButtonAlt={this.graphButtonAlt}
-// />}

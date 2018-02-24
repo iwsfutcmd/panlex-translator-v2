@@ -126,7 +126,9 @@
   offset-inline-end: 24px;
   z-index: 2;
   color: var(--mdc-theme-primary);
-  cursor: pointer;
+  background-color: white;
+  border: none;
+  /* cursor: pointer; */
 }
 
 @supports not (offset-inline-end: 0) {

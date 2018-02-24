@@ -21,12 +21,19 @@ export default class UidInput extends Component {
     }
   }
   
+  itemClick = id => {
+    this.setState({searchText: ''});
+    this.props.onNewRequest(id);
+    this.suggestMenu.open = false;
+  }
+
   renderSuggestion = s => (
     <li className="mdc-list-item" role="menuitem" onClick={
       () => {
-        this.setState({searchText: ''}); 
-        this.props.onNewRequest(s.id);
-        this.suggestMenu.open = false;
+        this.itemClick(s.id);
+        // this.setState({searchText: ''}); 
+        // this.props.onNewRequest(s.id);
+        // this.suggestMenu.open = false;
       }} 
       key={s.id}> 
       <div className='lv-item' dir={this.props.direction}>
@@ -69,20 +76,22 @@ export default class UidInput extends Component {
       <span>
         <span className="lv-input-container" style={this.props.style} dir={this.props.direction}>
           {this.state.loading && <div className="loading"><LoadingIcon/></div>}
-          <div 
-            ref={div => {if (div) {this.lvInput = new MDCTextField(div)}}}
-            className="mdc-text-field mdc-text-field--upgraded"
-          >
-            <input 
-              id="lv-input"
-              className="mdc-text-field__input"
-              type="text"
-              value={this.state.searchText}
-              onChange={this.onChange}
-            />
-            <label className="mdc-text-field__label" htmlFor="lv-input">{this.props.label}</label>
-            <div className="mdc-line-ripple"/>
-          </div>
+          <form onSubmit={e => {e.preventDefault(); this.itemClick(this.state.suggestions[0].id)}}>
+            <div 
+              ref={div => {if (div) {this.lvInput = new MDCTextField(div)}}}
+              className="mdc-text-field mdc-text-field--upgraded"
+            >
+              <input 
+                id="lv-input"
+                className="mdc-text-field__input"
+                type="text"
+                value={this.state.searchText}
+                onChange={this.onChange}
+              />
+              <label className="mdc-text-field__label" htmlFor="lv-input">{this.props.label}</label>
+              <div className="mdc-line-ripple"/>
+            </div>
+          </form>
         </span>
         {this.state.suggestions.length ? 
           <div 

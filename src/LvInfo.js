@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import '@material/elevation/dist/mdc.elevation.min.css';
+import '@material/chips/dist/mdc.chips.min.css';
 
 import './LvInfo.css';
 
@@ -10,9 +11,11 @@ export default class LvInfo extends Component {
       <div className="lv-info-box">
         <div
           className="chip mdc-theme--secondary-light-bg mdc-elevation--z1 droppable"
+          // className="mdc-chip mdc-theme--secondary-light-bg mdc-elevation--z1 droppable"
           onTouchStart={this.props.onTouchStart}
         >
           <span className="chip-label">{this.props.lang.name_expr_txt}</span>
+          {/* <span className="mdc-chip__text">{this.props.lang.name_expr_txt}</span> */}
         </div>
         <details className="lv-info">
           <summary>

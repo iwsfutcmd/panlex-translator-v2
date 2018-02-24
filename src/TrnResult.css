@@ -25,13 +25,14 @@
 }
 
 .graph-button {
-  inline-size: 24px;
-  block-size: 24px;
   margin: unset;
   margin-inline-end: 12px;
   padding: 4px;
   cursor: pointer;
-  user-select: none;
+  /* user-select: none; */
+  border: none;
+  background-color: white;
+  display: flex;
 }
 
 @media (max-width: 840px) {

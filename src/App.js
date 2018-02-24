@@ -30,7 +30,7 @@ import LoadingIcon from './LoadingIcon';
 
 const compactWidth = 840
 
-const DEBUG = false;
+const DEBUG = true;
 
 const initialUids = [
   'uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000'
@@ -58,6 +58,7 @@ class App extends Component {
       trnTxt: '',
       trnTrn: 0,
       interfaceLangDialogOpen: false,
+      interfaceLvTag: "",
       translations: [],
       pathExprs: [],
       exprGraphOpen: false,
@@ -90,6 +91,9 @@ class App extends Component {
       this.getOtherNames();
       this.cacheKar();
       this.cacheLoc();
+      // if (!this.fromLvCache(this.state.interfaceLangvar).IETFTags) {
+      //   this.cacheIETFTags(this.state.interfaceLangvar);
+      // }
       // let button = document.querySelector('.mdc-button');
       // let ripple = new mdc.ripple.MDCRipple(button);
       // ripple.layout();
@@ -156,7 +160,27 @@ class App extends Component {
     )
   }
 
-  fromLvCache = (lvId) => (this.state.lvCache.get(lvId) || {})
+  cacheIETFTags = lvId => (
+    lvId && getTranslations(this.fromLvCache(lvId).uid, "art-274", "art-420").then(
+      result => {
+        let lvCache = this.state.lvCache;
+        let lv = lvCache.get(lvId);
+        lv.IETFTags = result.sort((a,b) => a.txt.length - b.txt.length).map(t => t.txt);
+        lvCache.set(lvId, lv);
+        this.setState({lvCache});
+      }
+    )
+  )
+
+  getTag = lvId => {
+    let tags = this.fromLvCache(lvId).IETFTags;
+    if (!tags) {
+      this.cacheIETFTags(lvId);
+    }
+    return (tags && tags.length) ? tags[0] : "";
+  }
+
+  fromLvCache = lvId => (this.state.lvCache.get(lvId) || {})
 
   getInitialLangs = (initialUids) => {
     let initialUidsSet = new Set(initialUids);
@@ -325,7 +349,11 @@ class App extends Component {
 
   render() {
     return (
-      <div className="mdc-typography App" dir={this.state.direction}>
+      <div 
+        className="mdc-typography App"
+        dir={this.state.direction}
+        lang={this.getTag(this.state.interfaceLangvar)}
+      >
         <div>
           <PanLexAppBar 
             panlexLabel={this.getLabel('PanLex')}
@@ -393,6 +421,7 @@ class App extends Component {
                             type="text"
                             onChange={event => {this.setState({txt: event.target.value})}}
                             value={this.state.txt}
+                            lang={this.getTag(this.state.langDe.id)}
                           />
                           <label className="mdc-text-field__label" htmlFor="txt-input">
                             {this.getLabel('txt')}
@@ -459,7 +488,9 @@ class App extends Component {
                   <section className="card-title">
                     {this.state.notFound ? 
                       <span className="mdc-typography--caption" id="nno-label">{this.getLabel('nno')}</span> :
-                      <span id="first-trn-txt">{this.state.trnTxt}</span>
+                      <span lang={this.getTag(this.state.langAl.id)} id="first-trn-txt" tabIndex="0">
+                        {this.state.trnTxt}
+                      </span>
                     }
                     {this.state.loading ? <LoadingIcon/> : ''}
                   </section>
@@ -468,6 +499,8 @@ class App extends Component {
                     onExprClick={this.handleTrnExprClick}
                     onTrnToggle={this.backTranslate}
                     graphButtonAlt={[this.getLabel('trn'), this.getLabel('viz')].join(' — ')}
+                    tagDe={this.getTag(this.state.langDe.id)}
+                    tagAl={this.getTag(this.state.langAl.id)}
                   />
                 </div>
               </div>
@@ -479,7 +512,7 @@ class App extends Component {
             role="alertdialog">
             <div id="expr-graph-dialog-surface" className="mdc-dialog__surface">
               <section className="mdc-dialog__body">
-                <span className="material-icons close-button mdc-dialog__footer__button--accept">close</span>
+                <button className="material-icons close-button mdc-dialog__footer__button--accept">close</button>
                 {this.state.exprGraphLoading ? 
                   <LoadingIcon size={64}/> :
                   <ExprGraph pathExprs={this.state.pathExprs} pathDirect={this.state.pathDirect} lvCache={this.state.lvCache}/>
