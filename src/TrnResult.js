@@ -53,7 +53,7 @@ export default class TrnResult extends Component {
                     alt={this.props.graphButtonAlt}
                     data-index={index}
                   >
-                    <i className="material-icons">
+                    <i className="material-icons" data-index={index}>
                       more_vert
                     </i>
                   </button>

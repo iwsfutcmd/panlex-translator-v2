@@ -291,7 +291,7 @@ class App extends Component {
       this.translate);
   }
 
-  handleTrnExprClick = (trnExprNum) => {
+  handleTrnExprClick = trnExprNum => {
     this.setState({exprGraphLoading: true});
     this.exprGraphDialog.show();
     let trn = this.state.translations[trnExprNum]
