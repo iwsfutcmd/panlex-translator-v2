@@ -1,4 +1,5 @@
 import pnormaldist from "pnormaldist";
+import pkg from "../package.json";
 
 const VERSION = 2
 const APISERVER = 'https://api.panlex.org'
@@ -19,9 +20,10 @@ function query(ep, params) {
   let url = URLBASE + ep
   return(fetch(url, {
     method: 'POST',
-    headers: {
+    headers: new Headers({
+      'user-agent': `${pkg.name}/${pkg.version}`,
       'content-type': 'application/json',
-    },
+    }),
     body: JSON.stringify(params),
   })
   .then((response) => response.json()));
