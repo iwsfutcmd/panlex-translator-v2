@@ -21,7 +21,7 @@ function query(ep, params) {
   return(fetch(url, {
     method: 'POST',
     headers: new Headers({
-      'user-agent': `${pkg.name}/${pkg.version}`,
+      'x-app-name': `${pkg.name}/${pkg.version}`,
       'content-type': 'application/json',
     }),
     body: JSON.stringify(params),
