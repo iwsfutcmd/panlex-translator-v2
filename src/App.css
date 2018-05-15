@@ -53,7 +53,6 @@
 @media (max-width: 840px) {
   .trn {
     flex-direction: column;
-    /*padding: logical 0px 12px;*/
     padding-inline-start: 12px;
     padding-inline-end: 12px;
   }
@@ -61,14 +60,10 @@
   .trn-box {
     inline-size: 100%;
   }
-  /*
-  .uid-box {
-    flex-direction: column-reverse;
-  }*/
-  
-  /*.uid-box-button {
-    width: 100%;
-  }*/
+
+  .chip-list {
+    display: none !important;
+  }
 }
 
 .result {
