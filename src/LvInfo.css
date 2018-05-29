@@ -21,8 +21,9 @@
 }
 
 .lv-info-data {
-  margin-inline-start: 2px;
-  margin-inline-end: 2px;
+  /* margin-inline-start: 2px;
+  margin-inline-end: 2px; */
+  font-style: oblique;
 }
 
 @media (max-width: 840px) {

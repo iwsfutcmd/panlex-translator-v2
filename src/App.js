@@ -422,6 +422,7 @@ class App extends Component {
                             onChange={event => {this.setState({txt: event.target.value})}}
                             value={this.state.txt}
                             lang={this.getTag(this.state.langDe.id)}
+                            autoCapitalize="none"
                           />
                           <label className="mdc-text-field__label" htmlFor="txt-input">
                             {this.getLabel('txt')}

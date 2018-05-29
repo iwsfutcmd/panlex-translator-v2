@@ -87,6 +87,7 @@ export default class UidInput extends Component {
                 type="text"
                 value={this.state.searchText}
                 onChange={this.onChange}
+                autoCapitalize="none"
               />
               <label className="mdc-text-field__label" htmlFor="lv-input">{this.props.label}</label>
               <div className="mdc-line-ripple"/>

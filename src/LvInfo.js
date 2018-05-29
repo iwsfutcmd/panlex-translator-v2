@@ -17,18 +17,18 @@ export default class LvInfo extends Component {
           <span className="chip-label">{this.props.lang.name_expr_txt}</span>
           {/* <span className="mdc-chip__text">{this.props.lang.name_expr_txt}</span> */}
         </div>
-        <details className="lv-info">
-          <summary>
-            <span className="lv-info-line">
-              <span className="lv-info-label">
+        {/* <details className="lv-info">
+          <summary> */}
+            <span className="lv-info lv-info-line">
+              {/* <span className="lv-info-label">
                 {this.props.nomLabel}
-              </span>
+              </span> */}
               {this.props.lang.otherNames &&
                 <span className="lv-info-data">{this.props.lang.otherNames.slice(0,3).join(' — ')}</span>
               }
             </span>
-          </summary>
-          <div className="lv-info-line">
+          {/* </summary> */}
+          {/* <div className="lv-info-line">
             <span className="lv-info-label">
               {this.props.karLabel}
             </span>
@@ -46,7 +46,7 @@ export default class LvInfo extends Component {
               }
             </div>
           }
-        </details>
+        </details> */}
       </div>
     )
   }
