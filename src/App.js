@@ -35,7 +35,9 @@ const DEBUG = true;
 const initialUids = [
   'uig-000', 'bre-000', 'oss-000', 'sme-000', 'mhr-000', 'san-000', 'quz-000', 'oci-000', 'nci-000'
 ];
-const initialInterfaceUid = "eng-000";
+let u = new URLSearchParams(window.location.search);
+const initialInterfaceUid = u.get("lang") || "eng-000";
+
 class App extends Component {
   constructor(props) {
     super(props);
