@@ -84,7 +84,7 @@ function getTransPath(exprDe, exprAl) {
     include: 'trans_path',
     trans_distance: 2,
   };
-  return(query('/expr', queryParams).then(responseData => responseData.result[0]))
+  return(query('/expr', queryParams).then(responseData => responseData.result))
 }
 
 function getMultTranslations(txtArray, uidDe, uidAl) {

@@ -16,42 +16,54 @@ export default class ExprGraph extends Component{
   )
   
   prepGraph = (props) => {
-    let exprNodes = props.pathExprs.map((expr, index) => ({
-      id: index,
-      label: this.labelIfSelected(expr, index === this.state.nodeSelected),
-      shape: "box",
+    let startNodes = new Set(props.nodesDe);
+    let endNodes = new Set(props.nodesAl);
+    // let exprNodes = props.pathExprs.map((expr, index) => ({
+    //   id: index,
+    //   label: this.labelIfSelected(expr, index === this.state.nodeSelected),
+    //   shape: "box",
+    //   font: {
+    //     multi: true,
+    //     ital: {size: 12, vadjust: 2},
+    //   },
+    //   title: props.lvCache.get(expr.langvar).name_expr_txt,
+    // }))
+    // let lastNodeIndex = exprNodes.length - 1;
+    // if (exprNodes.length) {
+    //   for (let node of [exprNodes[0], exprNodes[lastNodeIndex]]) {
+    //     node.mass = exprNodes.length - 2;
+    //     node.font.size = 16;
+    //     node.font.ital.size = 14;
+    //     node.shape = "ellipse";
+    //   }
+    // }
+    // let exprEdges = []
+    // if (props.pathDirect) {
+    //   exprEdges.push({width: 2, from: 0, to: lastNodeIndex, arrows: {to: true, from: true}});
+    // }
+    // for (let node of exprNodes.slice(1, -1)) {
+    //   exprEdges.push({from: 0, to: node.id})
+    //   exprEdges.push({from: node.id, to: lastNodeIndex})
+    // }
+    // return({nodes: exprNodes, edges: exprEdges})
+    let nodeIds = Array.from(new Set(props.edges.flat()));
+    let nodes = nodeIds.map(n => ({
+      id: n, 
+      label: n.toString(),
+      shape: (startNodes.has(n) || endNodes.has(n)) ? "ellipse" : "box",
       font: {
         multi: true,
         ital: {size: 12, vadjust: 2},
       },
-      title: props.lvCache.get(expr.langvar).name_expr_txt,
-    }))
-    let lastNodeIndex = exprNodes.length - 1;
-    if (exprNodes.length) {
-      for (let node of [exprNodes[0], exprNodes[lastNodeIndex]]) {
-        node.mass = exprNodes.length - 2;
-        node.font.size = 16;
-        node.font.ital.size = 14;
-        node.shape = "ellipse";
-      }
-    }
-    // exprNodes[0].mass = exprNodes.length - 2;
-    // exprNodes[0].font.size = 24;
-    // exprNodes[0].font.ital.size = 16;
-    // exprNodes[0].shape = "ellipse";
-    // exprNodes[lastNodeIndex].mass = exprNodes.length - 2;
-    // exprNodes[lastNodeIndex].font.size = 24;
-    // exprNodes[lastNodeIndex].font.ital.size = 16;
-    // exprNodes[lastNodeIndex].shape = "ellipse";
-    let exprEdges = []
-    if (props.pathDirect) {
-      exprEdges.push({width: 2, from: 0, to: lastNodeIndex, arrows: {to: true, from: true}});
-    }
-    for (let node of exprNodes.slice(1, -1)) {
-      exprEdges.push({from: 0, to: node.id})
-      exprEdges.push({from: node.id, to: lastNodeIndex})
-    }
-    return({nodes: exprNodes, edges: exprEdges})
+      mass: 
+        endNodes.has(n) ? (nodeIds.length - 2) * 2 : 
+        startNodes.has(n) ? (nodeIds.length - 2) :
+        1,
+    }));
+
+    let edges = props.edges.map(([from, to]) => ({from, to}));
+    return({nodes, edges})
+
   };
   
   events = {

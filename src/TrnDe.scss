@@ -1,0 +1,18 @@
+@import './theme';
+
+@import '@material/react-text-field/index';
+@import '@material/react-material-icon/index';
+@import '@material/react-card/index';
+
+.trn-de-content {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    // inline-size: 100%;
+}
+
+.lv-input-dot {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}

@@ -16,6 +16,8 @@
   inline-size: fit-content;
   inline-size: -moz-fit-content;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
 .chip-label {

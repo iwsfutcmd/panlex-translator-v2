@@ -1,16 +1,25 @@
+@import './theme';
+
+@import '@material/react-button/index';
+@import '@material/react-fab/index';
+@import '@material/react-material-icon/index';
+
+// @import '@material/button/mixins';
+// @import './PanLexAppBar.scss';
+
 * {
   letter-spacing: unset !important;
 }
 
-.App {
-  --mdc-theme-primary: #C82521;
-  --mdc-theme-primary-light: #DF4A34;
-  --mdc-theme-primary-dark: #700000;
-  --mdc-theme-secondary: #aeaeae;
-  --mdc-theme-secondary-light: #e0e0e0;
-  --mdc-theme-secondary-dark: #7f7f7f;
-  --mdc-theme-background: #ffffff;
-}
+// .App {
+//   --mdc-theme-primary: #C82521;
+//   // --mdc-theme-primary-light: #DF4A34;
+//   // --mdc-theme-primary-dark: #700000;
+//   --mdc-theme-secondary: #aeaeae;
+//   // --mdc-theme-secondary-light: #e0e0e0;
+//   // --mdc-theme-secondary-dark: #7f7f7f;
+//   --mdc-theme-background: #ffffff;
+// }
 
 .trn {
   display: flex;
@@ -27,6 +36,21 @@
   padding-inline-end: 8px;
   box-sizing: border-box;
   inline-size: 50%;
+  margin-block-start: 8px;
+}
+
+.trn-de-container {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+}
+
+.trn-de-container > * {
+  margin-block-end: 8px;
+}
+
+.trn-de-container > div {
+  inline-size: 100%;
 }
 
 .trn-card {
@@ -38,7 +62,7 @@
 .uid-box {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   flex-direction: column;
 }
 
@@ -81,7 +105,7 @@
   position: unset !important;
 }
 
-.txt-input {
+.txt-input-form {
   display: flex;
   align-items: flex-start;
   padding-inline-start: 16px;
@@ -90,7 +114,7 @@
   padding-block-end: 8px;
 }
 
-#trn-txt {
+.trn-txt {
   inline-size: 100%;
 }
 
@@ -132,12 +156,12 @@
   }
 }
 
-#txt-input-container {
+.txt-input-container {
   inline-size: 100%;
 }
 
-#txt-input {
-  padding-inline-start: unset;
+.txt-input {
+  padding-inline-start: unset !important;
   border-bottom: unset;
   border-block-end: 1px solid rgba(0, 0, 0, .42);
 }

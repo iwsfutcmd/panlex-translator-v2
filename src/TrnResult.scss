@@ -1,3 +1,10 @@
+@import './theme';
+@import '@material/react-list/index';
+@import '@material/react-icon-button/index';
+@import '@material/react-material-icon/index';
+@import '@material/react-button/index';
+@import "@material/button/mixins";
+
 /* .trn-row {
   block-size: 40px !important;
   display: flex;
@@ -10,7 +17,9 @@
 } */
 
 .bon-bar-cell {
-  margin-inline-end: 32px;
+  margin-inline-end: 18px;
+  inline-size: 48px;
+  overflow: visible;
 }
 
 .bon-bar-cell-dense {
@@ -24,15 +33,26 @@
   padding-inline-end: 24px !important;
 }
 
-.graph-button {
+.pl-button {
   margin: unset;
-  margin-inline-end: 12px;
   padding: 4px;
   cursor: pointer;
   /* user-select: none; */
   border: none;
   background-color: white;
   display: flex;
+}
+
+.pp-button {
+  // @include mdc-button-filled-accessible($mdc-theme-secondary);
+  // @include mdc-button-horizontal-padding(6px);
+  // margin-inline-end: 12px;
+  // min-width: unset;
+}
+
+.def-button {
+  margin-inline-start: auto;
+  block-size: 32px;
 }
 
 @media (max-width: 840px) {
@@ -46,11 +66,13 @@
   inline-size: 48px;
   border-radius: 4px;
   overflow: hidden;
+  background-color: $mdc-theme-secondary;
 }
 
 .bon-bar {
   block-size: 100%;
   border-radius: inherit;
+  background-color: $mdc-theme-primary;
 }
 
 .trn-cell {
@@ -71,4 +93,16 @@
 
 .back-trn-item {
   height: unset !important;
+}
+
+.lang-circles {
+  display: flex;
+  flex-direction: row;
+  margin-inline-end: 8px;
+}
+
+.lang-circle {
+  min-inline-size: 8px;
+  min-block-size: 8px;
+  border-radius: 4px;
 }

@@ -1,6 +1,16 @@
-.don-button {
-    background-color: var(--mdc-theme-background, #ffffff) !important;
-    color: #000000 !important;
+@import './theme';
+
+@import '@material/react-top-app-bar/index';
+@import '@material/react-material-icon/index';
+@import '@material/react-button/index';
+@import '@material/react-material-icon/index';
+@import '@material/react-menu-surface/index';
+@import '@material/react-ripple/index';
+
+#don-button {
+    @include mdc-button-filled-accessible($mdc-theme-background);
+    // background-color: var(--mdc-theme-background, #ffffff) !important;
+    // color: #000000 !important;
 }
 
 #more-menu {

@@ -31,3 +31,7 @@
     flex-direction: column;
   }
 }
+
+.chip-dot {
+  margin-inline-start: 8px;
+}

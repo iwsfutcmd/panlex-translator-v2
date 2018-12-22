@@ -3,12 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "material-components-web": "^0.30.0",
+    "@material/react-button": "^0.6.2",
+    "@material/react-card": "^0.6.2",
+    "@material/react-chips": "^0.6.2",
+    "@material/react-fab": "^0.6.2",
+    "@material/react-icon-button": "^0.6.2",
+    "@material/react-list": "^0.6.2",
+    "@material/react-material-icon": "^0.6.2",
+    "@material/react-menu-surface": "^0.6.2",
+    "@material/react-ripple": "^0.6.2",
+    "@material/react-text-field": "^0.6.2",
+    "@material/react-top-app-bar": "^0.6.2",
+    "@material/typography": "^0.41.0",
+    "material-components-web": "^0.41.1",
+    "node-sass": "^4.10.0",
     "pnormaldist": "^1.0.1",
-    "react": "^16.2.0",
-    "react-dom": "16.2.0",
-    "react-graph-vis": "^1.0.1",
-    "react-scripts": "^1.0.13",
+    "react": "next",
+    "react-dom": "next",
+    "react-graph-vis": "^1.0.2",
+    "react-scripts": "^2.1.1",
     "shebang-loader": "^0.0.1"
   },
   "scripts": {
@@ -17,5 +30,11 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "homepage": "https://apps.panlex.org/translator"
+  "homepage": "https://apps.panlex.org/translator",
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
